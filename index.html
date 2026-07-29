@@ -2274,9 +2274,763 @@
         .admin-panel::-webkit-scrollbar-thumb:hover {
             background: var(--primary-dark);
         }
+
+        /* ===== وضع الإدارة فقط: إخفاء قسم المستخدم بالكامل (مع إبقاء التولبار) ===== */
+        body.admin-only .container > *:not(header),
+        body.admin-only #ad-container,
+        body.admin-only .back-btn {
+            display: none !important;
+        }
+
+        /* إخفاء زر الرجوع في التولبار لعدم وجود تنقل للمستخدم */
+        body.admin-only #header-back-btn {
+            display: none !important;
+        }
+
+        /* ============================================================
+           لوحة تحكم إدارية كاملة الشاشة (Dashboard)
+           ============================================================ */
+        body.admin-only {
+            --admin-bg: #eef1f8;
+            --admin-nav-bg: #ffffff;
+            --admin-border: rgba(15, 23, 42, 0.08);
+            --admin-ring: rgba(67, 97, 238, 0.12);
+        }
+
+        [data-theme="dark"] body.admin-only {
+            --admin-bg: #0b1120;
+            --admin-nav-bg: #111c33;
+            --admin-border: rgba(148, 163, 184, 0.16);
+            --admin-ring: rgba(99, 102, 241, 0.22);
+        }
+
+        body.admin-only .admin-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            max-width: none;
+            height: 100vh;
+            display: grid !important;
+            grid-template-columns: 88px minmax(0, 1fr);
+            grid-template-rows: auto minmax(0, 1fr);
+            grid-template-areas:
+                "head head"
+                "nav  main";
+            background: var(--admin-bg);
+            border-right: none;
+            box-shadow: none;
+            overflow: hidden;
+            opacity: 0;
+            transform: scale(0.99) translateY(10px);
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        body.admin-only .admin-panel.active {
+            opacity: 1;
+            transform: none;
+            pointer-events: auto;
+        }
+
+        /* ---- شريط علوي ---- */
+        body.admin-only .admin-header {
+            grid-area: head;
+            padding: 16px 26px;
+            gap: 16px;
+            box-shadow: 0 6px 24px rgba(15, 23, 42, 0.16);
+            position: relative;
+            z-index: 20;
+        }
+
+        .admin-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 0;
+        }
+
+        .admin-brand-icon {
+            width: 46px;
+            height: 46px;
+            flex-shrink: 0;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .admin-brand-text {
+            min-width: 0;
+        }
+
+        .admin-brand-text h2 {
+            font-size: 1.15rem;
+            margin: 0;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .admin-brand-sub {
+            display: block;
+            font-size: 12.5px;
+            opacity: 0.85;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .admin-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-inline-start: auto;
+        }
+
+        .admin-icon-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            font-size: 17px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .admin-icon-btn:hover {
+            background: rgba(255, 255, 255, 0.28);
+            transform: translateY(-2px);
+        }
+
+        body.admin-only .close-admin {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.12);
+            font-size: 18px;
+        }
+
+        body.admin-only .close-admin:hover {
+            transform: none;
+            background: rgba(247, 37, 133, 0.75);
+        }
+
+        /* ---- شريط الأيقونات الجانبي ---- */
+        body.admin-only .admin-nav {
+            grid-area: nav;
+            padding: 12px 10px;
+            gap: 5px;
+            background: var(--admin-nav-bg);
+            border-bottom: none;
+            border-inline-start: 1px solid var(--admin-border);
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+        }
+
+        body.admin-only .admin-nav-item {
+            position: relative;
+            flex-direction: column;
+            justify-content: center;
+            gap: 0;
+            padding: 6px;
+            border-radius: 18px;
+            border: 1px solid transparent;
+            text-align: center;
+            font-size: 11.5px;
+            font-weight: 700;
+            line-height: 1.35;
+            background: transparent;
+        }
+
+        /* في الوضع المطوي تظهر الأيقونات فقط مع تلميح الاسم */
+        body.admin-only .admin-panel:not(.nav-expanded) .admin-nav-item span {
+            display: none;
+        }
+
+        body.admin-only .admin-nav-item:hover {
+            transform: translateY(-2px);
+            border-color: var(--admin-border);
+            background: var(--light);
+        }
+
+        body.admin-only .admin-nav-item.active {
+            background: var(--gradient-primary);
+            box-shadow: 0 12px 26px var(--admin-ring);
+        }
+
+        /* مؤشر جانبي للعنصر النشط */
+        body.admin-only .admin-nav-item.active::before {
+            content: '';
+            position: absolute;
+            inset-inline-end: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 26px;
+            border-radius: 4px;
+            background: var(--primary);
+        }
+
+        body.admin-only .admin-nav-item i {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            background: rgba(67, 97, 238, 0.09);
+            color: var(--primary);
+            transition: var(--transition);
+        }
+
+        [data-theme="dark"] body.admin-only .admin-nav-item i {
+            background: rgba(99, 102, 241, 0.18);
+            color: var(--primary-light);
+        }
+
+        body.admin-only .admin-nav-item.active i {
+            background: rgba(255, 255, 255, 0.24);
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        body.admin-only .admin-nav-item span {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            width: 100%;
+            overflow: hidden;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        /* تلميح يظهر عند المرور في الوضع المطوي */
+        body.admin-only .admin-nav-item::after {
+            content: attr(data-label);
+            position: absolute;
+            inset-inline-end: calc(100% + 10px);
+            top: 50%;
+            transform: translateY(-50%) scale(0.96);
+            background: var(--dark);
+            color: var(--light);
+            padding: 7px 12px;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 700;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            z-index: 40;
+        }
+
+        body.admin-only .admin-nav-item:hover::after {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
+        }
+
+        /* ---- الوضع الموسّع للقائمة ---- */
+        body.admin-only .admin-panel.nav-expanded {
+            grid-template-columns: 272px minmax(0, 1fr);
+        }
+
+        body.admin-only .admin-panel.nav-expanded .admin-nav {
+            padding: 16px 12px;
+        }
+
+        body.admin-only .admin-panel.nav-expanded .admin-nav-item {
+            flex-direction: row;
+            justify-content: flex-start;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            font-size: 14.5px;
+            text-align: start;
+        }
+
+        body.admin-only .admin-panel.nav-expanded .admin-nav-item:hover {
+            transform: translateX(-4px);
+        }
+
+        body.admin-only .admin-panel.nav-expanded .admin-nav-item::after {
+            display: none;
+        }
+
+        body.admin-only .admin-panel.nav-expanded .admin-nav-item span {
+            text-align: start;
+        }
+
+        /* ---- منطقة المحتوى ---- */
+        body.admin-only .admin-content {
+            grid-area: main;
+            padding: 26px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        body.admin-only .admin-tab-content {
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        body.admin-only .admin-card {
+            background: var(--card-bg);
+            border: 1px solid var(--admin-border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 22px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+        }
+
+        body.admin-only .admin-card:hover {
+            transform: none;
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.07);
+        }
+
+        [data-theme="dark"] body.admin-only .admin-card:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        body.admin-only .admin-card h3 {
+            font-size: 1.08rem;
+            font-weight: 800;
+            padding-bottom: 14px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--admin-border);
+        }
+
+        body.admin-only .admin-card h3 i {
+            color: var(--primary);
+        }
+
+        /* نماذج بعمودين على الشاشات الكبيرة */
+        body.admin-only .admin-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2px 22px;
+            align-items: start;
+            margin-bottom: 0;
+        }
+
+        body.admin-only .admin-form > .form-group:has(textarea),
+        body.admin-only .admin-form > #mcq-options,
+        body.admin-only .admin-form > #truefalse-options,
+        body.admin-only .admin-form > .grades-checkboxes,
+        body.admin-only .admin-form > .btn-admin {
+            grid-column: 1 / -1;
+        }
+
+        body.admin-only .admin-form > .btn-admin {
+            justify-self: start;
+            margin-top: 6px;
+            padding: 13px 28px;
+        }
+
+        body.admin-only .form-control {
+            border-radius: 12px;
+            border-color: var(--admin-border);
+            background: var(--light);
+        }
+
+        [data-theme="dark"] body.admin-only .form-control {
+            background: rgba(15, 23, 42, 0.55);
+        }
+
+        body.admin-only .form-group label {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        /* ---- شريط الأدوات والتصفية ---- */
+        body.admin-only .admin-filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+            gap: 14px;
+        }
+
+        .admin-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .admin-search {
+            position: relative;
+            flex: 1 1 260px;
+        }
+
+        .admin-search > i {
+            position: absolute;
+            top: 50%;
+            inset-inline-start: 16px;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+            font-size: 15px;
+            pointer-events: none;
+        }
+
+        .admin-search input {
+            padding-inline-start: 44px !important;
+        }
+
+        .admin-search .search-clear {
+            position: absolute;
+            top: 50%;
+            inset-inline-end: 10px;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            font-size: 15px;
+            padding: 6px;
+            display: none;
+        }
+
+        .admin-search.has-value .search-clear {
+            display: block;
+        }
+
+        .list-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        [data-theme="dark"] .list-count {
+            background: rgba(99, 102, 241, 0.18);
+            color: var(--primary-light);
+        }
+
+        /* خطوات التصفية (الصف ← القسم ← المادة) */
+        .filter-steps {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .filter-step {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px dashed var(--admin-border);
+            color: var(--text-tertiary);
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: var(--transition);
+            max-width: 260px;
+        }
+
+        .filter-step .step-num {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--light-2);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .filter-step .step-value {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .filter-step.done {
+            border-style: solid;
+            border-color: transparent;
+            background: rgba(76, 201, 240, 0.12);
+            color: var(--text-primary);
+        }
+
+        .filter-step.done .step-num {
+            background: var(--gradient-success);
+            color: #fff;
+        }
+
+        .filter-step-sep {
+            color: var(--text-tertiary);
+            font-size: 12px;
+        }
+
+        /* ---- عناصر القوائم ---- */
+        body.admin-only .question-item {
+            background: var(--card-bg);
+            border: 1px solid var(--admin-border);
+            border-radius: 16px;
+            padding: 18px 20px;
+        }
+
+        body.admin-only .question-item:hover {
+            transform: translateY(-2px);
+            background: var(--card-bg);
+            box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+            border-color: rgba(67, 97, 238, 0.35);
+        }
+
+        [data-theme="dark"] body.admin-only .question-item:hover {
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4);
+        }
+
+        body.admin-only .question-meta span {
+            background: var(--light);
+            border: 1px solid var(--admin-border);
+            font-size: 12.5px;
+            font-weight: 600;
+        }
+
+        body.admin-only .questions-list {
+            display: grid;
+            gap: 14px;
+            margin-top: 0;
+        }
+
+        /* حالة فارغة / قفل */
+        .admin-empty {
+            text-align: center;
+            padding: 46px 26px;
+            border: 1px dashed var(--admin-border);
+            border-radius: 18px;
+            background: var(--light);
+        }
+
+        .admin-empty i {
+            font-size: 42px;
+            color: var(--primary);
+            margin-bottom: 14px;
+            display: block;
+        }
+
+        .admin-empty h3 {
+            border: none !important;
+            justify-content: center;
+            margin-bottom: 8px !important;
+            padding-bottom: 0 !important;
+        }
+
+        .admin-empty p {
+            color: var(--text-secondary);
+            font-size: 14.5px;
+        }
+
+        /* ---- بطاقات الإحصائيات ---- */
+        body.admin-only .admin-stats-grid,
+        body.admin-only .user-stats-grid {
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 16px;
+        }
+
+        body.admin-only .admin-stat-card,
+        body.admin-only .user-stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--admin-border);
+            border-radius: 18px;
+            padding: 20px;
+            text-align: start;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.admin-only .admin-stat-card::after,
+        body.admin-only .user-stat-card::after {
+            content: '';
+            position: absolute;
+            inset-inline-end: -30px;
+            top: -30px;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            opacity: 0.08;
+        }
+
+        body.admin-only .admin-stat-card:hover,
+        body.admin-only .user-stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.09);
+        }
+
+        body.admin-only .admin-stat-value,
+        body.admin-only .user-stat-value {
+            font-size: 2rem;
+        }
+
+        /* ---- شاشة القفل ---- */
+        .admin-lock-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            min-height: 65vh;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        body.admin-only .admin-lock-screen {
+            display: flex;
+        }
+
+        .admin-lock-screen .lock-logo {
+            width: 110px;
+            height: 110px;
+            object-fit: contain;
+        }
+
+        .admin-lock-screen .lock-icon {
+            font-size: 3rem;
+            color: var(--primary);
+        }
+
+        .admin-lock-screen h2 {
+            color: var(--text-primary);
+        }
+
+        .admin-lock-screen p {
+            color: var(--text-secondary);
+            max-width: 420px;
+        }
+
+        /* ---- استجابة الشاشات الصغيرة ---- */
+        @media (max-width: 992px) {
+            body.admin-only .admin-panel,
+            body.admin-only .admin-panel.nav-expanded {
+                grid-template-columns: minmax(0, 1fr);
+                grid-template-rows: auto auto minmax(0, 1fr);
+                grid-template-areas:
+                    "head"
+                    "nav"
+                    "main";
+            }
+
+            body.admin-only .admin-nav-item::after,
+            body.admin-only .admin-nav-item.active::before {
+                display: none;
+            }
+
+            #nav-toggle {
+                display: none;
+            }
+
+            body.admin-only .admin-nav {
+                flex-direction: row;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 12px;
+                border-inline-start: none;
+                border-bottom: 1px solid var(--admin-border);
+                scrollbar-width: none;
+            }
+
+            body.admin-only .admin-nav::-webkit-scrollbar {
+                display: none;
+            }
+
+            body.admin-only .admin-nav-item,
+            body.admin-only .admin-panel.nav-expanded .admin-nav-item {
+                flex-direction: column;
+                gap: 6px;
+                min-width: 86px;
+                padding: 10px 8px;
+                font-size: 11.5px;
+                text-align: center;
+            }
+
+            /* على الشاشات الصغيرة تظهر أسماء الأقسام أسفل الأيقونات */
+            body.admin-only .admin-panel:not(.nav-expanded) .admin-nav-item span {
+                display: -webkit-box;
+            }
+
+            body.admin-only .admin-nav-item:hover {
+                transform: none;
+            }
+
+            body.admin-only .admin-content {
+                padding: 16px;
+            }
+
+            body.admin-only .admin-card {
+                padding: 18px;
+                border-radius: 16px;
+            }
+
+            .admin-brand-sub {
+                display: none;
+            }
+        }
+
+        /* شاشة القفل الإدارية */
+        .admin-lock-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            min-height: 65vh;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        body.admin-only .admin-lock-screen {
+            display: flex;
+        }
+
+        .admin-lock-screen .lock-logo {
+            width: 110px;
+            height: 110px;
+            object-fit: contain;
+        }
+
+        .admin-lock-screen .lock-icon {
+            font-size: 3rem;
+            color: var(--primary);
+        }
+
+        .admin-lock-screen h2 {
+            color: var(--text-primary);
+        }
+
+        .admin-lock-screen p {
+            color: var(--text-secondary);
+            max-width: 420px;
+        }
     </style>
 </head>
-<body>
+<body class="admin-only">
     <div class="container">
         <header>
             <div class="header-left">
@@ -2437,6 +3191,17 @@
         </div>
     </div>
     
+    <!-- شاشة الإدارة فقط (تظهر بدلًا من قسم المستخدم) -->
+    <div class="admin-lock-screen" id="admin-lock-screen">
+        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhdyuIMWOk4qbKO_qCaKOHo859JMs3To_OJjpQ8u5fU0ULewA-AdNp7Izuv9PUOIOTGTUsNM6DTVVbRWKe2OEDTBcHnxOnOrCylsq_V3YhUFPqTkPJ7XOuzWzbCXKW-UnoLEwqsE8XjaHiWPZu2dC_pESia4uQOATzelupKDAUbuO1_jH2003wsgUO0PPiO/s1080/Selah%20Elazhary%20Transperant%20logo.png" alt="Logo" class="lock-logo">
+        <i class="fas fa-user-shield lock-icon"></i>
+        <h2>لوحة التحكم الإدارية</h2>
+        <p>هذه الصفحة مخصصة للإدارة فقط. الرجاء إدخال كلمة المرور للمتابعة.</p>
+        <button class="btn btn-primary btn-3d" id="open-admin-btn">
+            <i class="fas fa-lock"></i> دخول لوحة التحكم
+        </button>
+    </div>
+
     <!-- زر الرجوع للخلف - تم إخفاؤه -->
     <div class="back-btn btn-3d" id="back-btn" style="display: none !important;">
         <i class="fas fa-arrow-left"></i>
@@ -2450,13 +3215,24 @@
     <!-- لوحة التحكم -->
     <div class="admin-panel" id="admin-panel">
         <div class="admin-header">
-            <h2>
-                <i class="fas fa-cogs"></i>
-                لوحة التحكم الإدارية
-            </h2>
-            <button class="close-admin" id="close-admin">
-                <i class="fas fa-times"></i>
-            </button>
+            <div class="admin-brand">
+                <button class="admin-icon-btn" id="nav-toggle" title="توسيع/طي قائمة الأقسام">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="admin-brand-icon"><i class="fas fa-user-shield"></i></div>
+                <div class="admin-brand-text">
+                    <h2>لوحة التحكم الإدارية</h2>
+                    <span class="admin-brand-sub">سلاح الأزهري — المرحلة الإعدادية</span>
+                </div>
+            </div>
+            <div class="admin-header-actions">
+                <button class="admin-icon-btn" id="admin-theme-toggle" title="تبديل الوضع الليلي">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="close-admin" id="close-admin" title="خروج">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
         </div>
         
         <div class="admin-nav">
@@ -2511,7 +3287,68 @@
             <div id="add-question-tab" class="admin-tab-content active">
                 <div class="admin-card">
                     <h3><i class="fas fa-plus-circle"></i> إضافة سؤال جديد</h3>
+
+                    <div class="filter-steps" id="question-form-steps">
+                        <span class="filter-step" id="q-step-year">
+                            <span class="step-num">1</span>
+                            <span class="step-value">الصف الدراسي</span>
+                        </span>
+                        <i class="fas fa-chevron-left filter-step-sep"></i>
+                        <span class="filter-step" id="q-step-section">
+                            <span class="step-num">2</span>
+                            <span class="step-value">القسم</span>
+                        </span>
+                        <i class="fas fa-chevron-left filter-step-sep"></i>
+                        <span class="filter-step" id="q-step-subject">
+                            <span class="step-num">3</span>
+                            <span class="step-value">المادة</span>
+                        </span>
+                        <i class="fas fa-chevron-left filter-step-sep"></i>
+                        <span class="filter-step" id="q-step-lesson">
+                            <span class="step-num">4</span>
+                            <span class="step-value">الدرس</span>
+                        </span>
+                        <i class="fas fa-chevron-left filter-step-sep"></i>
+                        <span class="filter-step" id="q-step-sublesson">
+                            <span class="step-num">5</span>
+                            <span class="step-value">القسم الفرعي</span>
+                        </span>
+                    </div>
+
                     <div class="admin-form">
+                        <div class="form-group">
+                            <label for="question-year">1) الصف الدراسي:</label>
+                            <select id="question-year" class="form-control">
+                                <option value="">اختر الصف الدراسي</option>
+                                <option value="prep1">الصف الأول الإعدادي</option>
+                                <option value="prep2">الصف الثاني الإعدادي</option>
+                                <option value="prep3">الصف الثالث الإعدادي</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="question-section">2) القسم:</label>
+                            <select id="question-section" class="form-control" disabled>
+                                <option value="">اختر الصف أولًا</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="question-subject">3) المادة الدراسية:</label>
+                            <select id="question-subject" class="form-control" disabled>
+                                <option value="">اختر القسم أولًا</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="question-lesson">4) الدرس (اختياري):</label>
+                            <select id="question-lesson" class="form-control" disabled>
+                                <option value="">اختر المادة أولًا</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="question-sublesson">5) القسم الفرعي (اختياري):</label>
+                            <select id="question-sublesson" class="form-control" disabled>
+                                <option value="">اختر الدرس أولًا</option>
+                            </select>
+                        </div>
                         <div class="form-group">
                             <label for="question-text">نص السؤال:</label>
                             <textarea id="question-text" class="form-control" rows="3" placeholder="أدخل نص السؤال هنا"></textarea>
@@ -2562,38 +3399,6 @@
                                 <option value="hard">صعب</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="question-year">الصف الدراسي:</label>
-                            <select id="question-year" class="form-control">
-                                <option value="prep1">الصف الأول الإعدادي</option>
-                                <option value="prep2">الصف الثاني الإعدادي</option>
-                                <option value="prep3">الصف الثالث الإعدادي</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="question-section">القسم:</label>
-                            <select id="question-section" class="form-control">
-                                <!-- سيتم ملؤها ديناميكيًا -->
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="question-subject">المادة الدراسية:</label>
-                            <select id="question-subject" class="form-control">
-                                <!-- سيتم ملؤها ديناميكيًا -->
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="question-lesson">الدرس:</label>
-                            <select id="question-lesson" class="form-control">
-                                <!-- سيتم ملؤها ديناميكيًا -->
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="question-sublesson">القسم الفرعي:</label>
-                            <select id="question-sublesson" class="form-control">
-                                <!-- سيتم ملؤها ديناميكيًا -->
-                            </select>
-                        </div>
                         <button class="btn-admin" id="add-question-btn">
                             <i class="fas fa-plus"></i> إضافة السؤال
                         </button>
@@ -2604,25 +3409,60 @@
             <!-- تبويب إدارة الأسئلة -->
             <div id="manage-questions-tab" class="admin-tab-content">
                 <div class="admin-card">
-                    <h3><i class="fas fa-list"></i> جميع الأسئلة</h3>
+                    <h3><i class="fas fa-filter"></i> اختر الصف ثم القسم ثم المادة</h3>
+
+                    <div class="filter-steps" id="filter-steps">
+                        <span class="filter-step" id="step-year">
+                            <span class="step-num">1</span>
+                            <span class="step-value">الصف الدراسي</span>
+                        </span>
+                        <i class="fas fa-chevron-left filter-step-sep"></i>
+                        <span class="filter-step" id="step-section">
+                            <span class="step-num">2</span>
+                            <span class="step-value">القسم</span>
+                        </span>
+                        <i class="fas fa-chevron-left filter-step-sep"></i>
+                        <span class="filter-step" id="step-subject">
+                            <span class="step-num">3</span>
+                            <span class="step-value">المادة</span>
+                        </span>
+                    </div>
+
                     <div class="admin-filters">
                         <select id="filter-year" class="form-control">
-                            <option value="">جميع الصفوف</option>
+                            <option value="">اختر الصف الدراسي</option>
                             <option value="prep1">الصف الأول الإعدادي</option>
                             <option value="prep2">الصف الثاني الإعدادي</option>
                             <option value="prep3">الصف الثالث الإعدادي</option>
                         </select>
-                        <select id="filter-section" class="form-control">
-                            <option value="">جميع الأقسام</option>
+                        <select id="filter-section" class="form-control" disabled>
+                            <option value="">اختر القسم</option>
                         </select>
-                        <select id="filter-subject" class="form-control">
-                            <option value="">جميع المواد</option>
+                        <select id="filter-subject" class="form-control" disabled>
+                            <option value="">اختر المادة</option>
+                        </select>
+                        <select id="filter-lesson" class="form-control" disabled>
+                            <option value="">كل الدروس</option>
                         </select>
                         <select id="filter-type" class="form-control">
                             <option value="">جميع الأنواع</option>
                             <option value="mcq">اختيار من متعدد</option>
                             <option value="truefalse">صح أم خطأ</option>
                         </select>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <h3><i class="fas fa-list"></i> الأسئلة</h3>
+                    <div class="admin-toolbar">
+                        <div class="admin-search" id="questions-search-wrap">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="questions-search" class="form-control" placeholder="ابحث داخل نص السؤال أو الخيارات أو التصنيف...">
+                            <button type="button" class="search-clear" data-clear="questions-search" title="مسح البحث">
+                                <i class="fas fa-times-circle"></i>
+                            </button>
+                        </div>
+                        <span class="list-count" id="questions-count"><i class="fas fa-hashtag"></i> 0 سؤال</span>
                     </div>
                     <div id="all-questions-list" class="questions-list">
                         <!-- سيتم ملؤها ديناميكيًا -->
@@ -2677,6 +3517,28 @@
                         <div class="admin-stat-card">
                             <div class="admin-stat-value" id="active-users">0</div>
                             <div class="admin-stat-label">مستخدمين نشطين</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <h3><i class="fas fa-sitemap"></i> إحصائيات المحتوى</h3>
+                    <div class="admin-stats-grid">
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-value" id="total-sections">0</div>
+                            <div class="admin-stat-label">الأقسام</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-value" id="total-subjects">0</div>
+                            <div class="admin-stat-label">المواد</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-value" id="total-lessons">0</div>
+                            <div class="admin-stat-label">الدروس</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-value" id="total-sublessons">0</div>
+                            <div class="admin-stat-label">الأقسام الفرعية</div>
                         </div>
                     </div>
                 </div>
@@ -2772,6 +3634,16 @@
                 
                 <div class="admin-card">
                     <h3><i class="fas fa-list"></i> الأقسام الحالية</h3>
+                    <div class="admin-toolbar">
+                        <div class="admin-search">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="sections-search" class="form-control" placeholder="ابحث باسم القسم أو وصفه...">
+                            <button type="button" class="search-clear" data-clear="sections-search" title="مسح البحث">
+                                <i class="fas fa-times-circle"></i>
+                            </button>
+                        </div>
+                        <span class="list-count" id="sections-count"><i class="fas fa-hashtag"></i> 0 قسم</span>
+                    </div>
                     <div id="sections-list" class="questions-list">
                         <!-- سيتم ملؤها ديناميكيًا -->
                     </div>
@@ -2826,6 +3698,16 @@
                 
                 <div class="admin-card">
                     <h3><i class="fas fa-list"></i> المواد الحالية</h3>
+                    <div class="admin-toolbar">
+                        <div class="admin-search">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="subjects-search" class="form-control" placeholder="ابحث باسم المادة أو القسم التابع له...">
+                            <button type="button" class="search-clear" data-clear="subjects-search" title="مسح البحث">
+                                <i class="fas fa-times-circle"></i>
+                            </button>
+                        </div>
+                        <span class="list-count" id="subjects-count"><i class="fas fa-hashtag"></i> 0 مادة</span>
+                    </div>
                     <div id="subjects-list" class="questions-list">
                         <!-- سيتم ملؤها ديناميكيًا -->
                     </div>
@@ -2876,6 +3758,16 @@
                 
                 <div class="admin-card">
                     <h3><i class="fas fa-list"></i> الدروس الحالية</h3>
+                    <div class="admin-toolbar">
+                        <div class="admin-search">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="lessons-search" class="form-control" placeholder="ابحث باسم الدرس أو المادة التابع لها...">
+                            <button type="button" class="search-clear" data-clear="lessons-search" title="مسح البحث">
+                                <i class="fas fa-times-circle"></i>
+                            </button>
+                        </div>
+                        <span class="list-count" id="lessons-count"><i class="fas fa-hashtag"></i> 0 درس</span>
+                    </div>
                     <div id="lessons-list" class="questions-list">
                         <!-- سيتم ملؤها ديناميكيًا -->
                     </div>
@@ -2926,6 +3818,16 @@
                 
                 <div class="admin-card">
                     <h3><i class="fas fa-list"></i> الأقسام الفرعية الحالية</h3>
+                    <div class="admin-toolbar">
+                        <div class="admin-search">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="sublessons-search" class="form-control" placeholder="ابحث باسم القسم الفرعي أو الدرس التابع له...">
+                            <button type="button" class="search-clear" data-clear="sublessons-search" title="مسح البحث">
+                                <i class="fas fa-times-circle"></i>
+                            </button>
+                        </div>
+                        <span class="list-count" id="sublessons-count"><i class="fas fa-hashtag"></i> 0 قسم فرعي</span>
+                    </div>
                     <div id="sublessons-list" class="questions-list">
                         <!-- سيتم ملؤها ديناميكيًا -->
                     </div>
@@ -3002,13 +3904,24 @@
                     </div>
                     
                     <div class="setting-item">
-                        <label class="setting-label">استعادة نسخة احتياطية:</label>
+                        <label class="setting-label">استعادة نسخة احتياطية من ملف:</label>
                         <input type="file" id="backup-file" class="form-control" accept=".json">
                         <button class="backup-btn" id="restore-backup-btn" style="margin-top: 10px;">
                             <i class="fas fa-upload"></i> استعادة النسخة
                         </button>
+                        <p style="color: var(--text-secondary); font-size: 13.5px; margin-top: 6px;">
+                            النسخة تحتوي على قاعدة البيانات بالكامل (الأسئلة والأقسام والمواد والدروس والنتائج والإعلانات والإعدادات) وتُعيد كل شيء كما كان.
+                        </p>
                     </div>
-                    
+
+                    <div class="setting-item">
+                        <label class="setting-label">استعادة آخر نسخة تلقائية (محفوظة داخل المتصفح):</label>
+                        <button class="backup-btn" id="restore-auto-backup-btn">
+                            <i class="fas fa-rotate-left"></i> استعادة آخر نسخة تلقائية
+                        </button>
+                        <div id="auto-backup-info" style="color: var(--text-secondary); font-size: 14px; margin-top: 8px;"></div>
+                    </div>
+
                     <div class="setting-item">
                         <label class="setting-label">آخر نسخة احتياطية:</label>
                         <div id="last-backup-info" style="color: var(--text-secondary); font-size: 14px;">
@@ -3089,19 +4002,47 @@
     let examActive = true;
     let defaultExamTime = 10;
     let currentUser = null;
-    let savedState = JSON.parse(localStorage.getItem('quizState')) || {};
+    let savedState = safeParse(localStorage.getItem('quizState')) || {};
     let currentEditingQuestionId = null;
-    let currentAd = JSON.parse(localStorage.getItem('currentAd')) || null;
+    let currentAd = safeParse(localStorage.getItem('currentAd'));
     let autoBackupEnabled = localStorage.getItem('autoBackupEnabled') !== 'false';
-    let userStats = JSON.parse(localStorage.getItem('userStats')) || {
-        totalVisits: 0,
-        uniqueUsers: new Set(),
-        dailyActiveUsers: new Set(),
-        userSessions: [],
-        activeUsers: new Set(),
-        permanentUsers: new Set(),
-        userActivities: []
-    };
+    // ملاحظة: البيانات المحفوظة في localStorage تعود كمصفوفات، لذا يتم تطبيعها إلى Set
+    let userStats = normalizeUserStats(safeParse(localStorage.getItem('userStats')));
+
+    // تحويل أي بيانات إحصائيات محفوظة إلى الشكل الصحيح (Set/Array)
+    function normalizeUserStats(saved) {
+        const data = saved || {};
+        return {
+            totalVisits: Number(data.totalVisits) || 0,
+            uniqueUsers: new Set(data.uniqueUsers || []),
+            dailyActiveUsers: new Set(data.dailyActiveUsers || []),
+            userSessions: Array.isArray(data.userSessions) ? data.userSessions : [],
+            activeUsers: new Set(data.activeUsers || []),
+            permanentUsers: new Set(data.permanentUsers || []),
+            userActivities: Array.isArray(data.userActivities) ? data.userActivities : []
+        };
+    }
+
+    // تحليل JSON بأمان دون كسر الصفحة
+    function safeParse(value) {
+        try {
+            return value ? JSON.parse(value) : null;
+        } catch (error) {
+            console.warn('تعذر قراءة بيانات محفوظة:', error);
+            return null;
+        }
+    }
+
+    // تأمين النصوص القادمة من قاعدة البيانات قبل عرضها داخل HTML
+    function escapeHtml(value) {
+        if (value === null || value === undefined) return '';
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
     
     // متغير Dark Mode
     let isDarkMode = localStorage.getItem('darkMode') === 'true';
@@ -3220,14 +4161,47 @@
         restoreBackupBtn: document.getElementById('restore-backup-btn'),
         lastBackupInfo: document.getElementById('last-backup-info'),
         questionYear: document.getElementById('question-year'),
-        
+
+        // مؤشر خطوات نموذج إضافة سؤال
+        qStepYear: document.getElementById('q-step-year'),
+        qStepSection: document.getElementById('q-step-section'),
+        qStepSubject: document.getElementById('q-step-subject'),
+        qStepLesson: document.getElementById('q-step-lesson'),
+        qStepSublesson: document.getElementById('q-step-sublesson'),
+
         // عناصر إحصائيات المستخدمين
         totalUsersCount: document.getElementById('total-users-count'),
         activeUsersCount: document.getElementById('active-users-count'),
         dailyActiveCount: document.getElementById('daily-active-count'),
         avgSessionCount: document.getElementById('avg-session-count'),
         userActivityChart: document.getElementById('user-activity-chart'),
-        userActivityList: document.getElementById('user-activity-list')
+        userActivityList: document.getElementById('user-activity-list'),
+
+        // عناصر وضع الإدارة فقط
+        adminLockScreen: document.getElementById('admin-lock-screen'),
+        openAdminBtn: document.getElementById('open-admin-btn'),
+        adminThemeToggle: document.getElementById('admin-theme-toggle'),
+        navToggle: document.getElementById('nav-toggle'),
+
+        // عناصر التصفية والبحث الجديدة
+        filterLesson: document.getElementById('filter-lesson'),
+        questionsSearch: document.getElementById('questions-search'),
+        questionsCount: document.getElementById('questions-count'),
+        stepYear: document.getElementById('step-year'),
+        stepSection: document.getElementById('step-section'),
+        stepSubject: document.getElementById('step-subject'),
+        sectionsSearch: document.getElementById('sections-search'),
+        subjectsSearch: document.getElementById('subjects-search'),
+        lessonsSearch: document.getElementById('lessons-search'),
+        sublessonsSearch: document.getElementById('sublessons-search'),
+        sectionsCount: document.getElementById('sections-count'),
+        subjectsCount: document.getElementById('subjects-count'),
+        lessonsCount: document.getElementById('lessons-count'),
+        sublessonsCount: document.getElementById('sublessons-count'),
+        totalSections: document.getElementById('total-sections'),
+        totalSubjects: document.getElementById('total-subjects'),
+        totalLessons: document.getElementById('total-lessons'),
+        totalSublessons: document.getElementById('total-sublessons')
     };
 
     // تهيئة التطبيق
@@ -3242,6 +4216,9 @@
                 if (elements.themeToggle) {
                     elements.themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
                 }
+                if (elements.adminThemeToggle) {
+                    elements.adminThemeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                }
             }
             
             setupEventListeners();
@@ -3250,9 +4227,9 @@
             restoreSavedState();
             loadAd();
             
-            // عرض الصفوف الدراسية مباشرة عند فتح التطبيق
-            elements.yearSelectionContainer.style.display = 'grid';
-            
+            // قسم المستخدم مخفي (وضع الإدارة فقط) - نطلب كلمة المرور مباشرة
+            showPasswordModal();
+
             window.addEventListener('beforeunload', saveCurrentState);
             
             // إضافة مستمع لزر الرجوع في المتصفح
@@ -3350,17 +4327,9 @@
     // تحميل إحصائيات المستخدمين
     function loadUserStats() {
         try {
-            const savedStats = JSON.parse(localStorage.getItem('userStats'));
+            const savedStats = safeParse(localStorage.getItem('userStats'));
             if (savedStats) {
-                userStats = {
-                    totalVisits: savedStats.totalVisits || 0,
-                    uniqueUsers: new Set(savedStats.uniqueUsers || []),
-                    dailyActiveUsers: new Set(savedStats.dailyActiveUsers || []),
-                    userSessions: savedStats.userSessions || [],
-                    activeUsers: new Set(savedStats.activeUsers || []),
-                    permanentUsers: new Set(savedStats.permanentUsers || []),
-                    userActivities: savedStats.userActivities || []
-                };
+                userStats = normalizeUserStats(savedStats);
             }
         } catch (error) {
             console.error('خطأ في تحميل إحصائيات المستخدمين:', error);
@@ -3482,6 +4451,10 @@
                 
                 // تحديث القوائم المنسدلة في لوحة الإدارة
                 updateSectionDropdowns();
+                // تحديث قوائم الإدارة الحية
+                loadSectionsForAdmin();
+                loadSubjectsForAdmin();
+                updateContentStats();
             }, (error) => {
                 console.error('خطأ في تحميل الأقسام:', error);
             });
@@ -3504,6 +4477,10 @@
                 
                 // تحديث القوائم المنسدلة في لوحة الإدارة
                 updateSubjectDropdowns();
+                // تحديث قوائم الإدارة الحية
+                loadSubjectsForAdmin();
+                loadLessonsForAdmin();
+                updateContentStats();
             }, (error) => {
                 console.error('خطأ في تحميل المواد:', error);
             });
@@ -3527,6 +4504,11 @@
                 // تحديث القوائم المنسدلة في لوحة الإدارة
                 updateLessonDropdowns();
                 updateLessonDropdownsForSublessons();
+                refreshQuestionFilterDropdowns();
+                // تحديث قوائم الإدارة الحية
+                loadLessonsForAdmin();
+                loadSublessonsForAdmin();
+                updateContentStats();
             }, (error) => {
                 console.error('خطأ في تحميل الدروس:', error);
             });
@@ -3549,6 +4531,9 @@
                 
                 // تحديث القوائم المنسدلة في لوحة الإدارة
                 updateSublessonDropdowns();
+                // تحديث قوائم الإدارة الحية
+                loadSublessonsForAdmin();
+                updateContentStats();
             }, (error) => {
                 console.error('خطأ في تحميل الأقسام الفرعية:', error);
             });
@@ -3560,26 +4545,6 @@
     // تحديث قوائم الأقسام المنسدلة - مع التصفية حسب الصف
     function updateSectionDropdowns(selectedYear = '') {
         try {
-            // تحديث قائمة الأقسام في إضافة سؤال مع التصفية
-            if (elements.questionSection) {
-                elements.questionSection.innerHTML = '';
-                
-                let filteredSections = sections;
-                if (selectedYear) {
-                    // تصفية الأقسام حسب الصف المختار
-                    filteredSections = sections.filter(section => 
-                        section.grades && section.grades.includes(selectedYear)
-                    );
-                }
-                
-                filteredSections.forEach(section => {
-                    const option = document.createElement('option');
-                    option.value = section.id;
-                    option.textContent = section.name;
-                    elements.questionSection.appendChild(option);
-                });
-            }
-            
             // تحديث قائمة الأقسام في إضافة مادة (بدون تصفية)
             if (elements.newSubjectSection) {
                 elements.newSubjectSection.innerHTML = '';
@@ -3590,45 +4555,19 @@
                     elements.newSubjectSection.appendChild(option);
                 });
             }
-            
-            // تحديث قائمة الأقسام في التصفية
-            if (elements.filterSection) {
-                elements.filterSection.innerHTML = '<option value="">جميع الأقسام</option>';
-                sections.forEach(section => {
-                    const option = document.createElement('option');
-                    option.value = section.id;
-                    option.textContent = section.name;
-                    elements.filterSection.appendChild(option);
-                });
-            }
         } catch (error) {
             console.error('خطأ في تحديث قوائم الأقسام:', error);
         }
+
+        // قوائم نموذج "إضافة سؤال" تُبنى بشكل متسلسل (الصف ← القسم ← المادة ← الدرس ← القسم الفرعي)
+        refreshQuestionFormDropdowns();
+        // قوائم تبويب "إدارة الأسئلة" تُبنى بشكل متسلسل (الصف ← القسم ← المادة)
+        refreshQuestionFilterDropdowns();
     }
-    
+
     // تحديث قوائم المواد المنسدلة - مع التصفية حسب القسم
     function updateSubjectDropdowns(selectedSection = '') {
         try {
-            // تحديث قائمة المواد في إضافة سؤال مع التصفية
-            if (elements.questionSubject) {
-                elements.questionSubject.innerHTML = '<option value="">اختر المادة</option>';
-                
-                let filteredSubjects = subjects;
-                if (selectedSection) {
-                    // تصفية المواد حسب القسم المختار
-                    filteredSubjects = subjects.filter(subject => 
-                        subject.sectionId === selectedSection
-                    );
-                }
-                
-                filteredSubjects.forEach(subject => {
-                    const option = document.createElement('option');
-                    option.value = subject.id;
-                    option.textContent = subject.name;
-                    elements.questionSubject.appendChild(option);
-                });
-            }
-            
             // تحديث قائمة المواد في إضافة درس (بدون تصفية)
             if (elements.newLessonSubject) {
                 elements.newLessonSubject.innerHTML = '<option value="">اختر المادة</option>';
@@ -3639,49 +4578,21 @@
                     elements.newLessonSubject.appendChild(option);
                 });
             }
-            
-            // تحديث قائمة المواد في التصفية
-            if (elements.filterSubject) {
-                elements.filterSubject.innerHTML = '<option value="">جميع المواد</option>';
-                subjects.forEach(subject => {
-                    const option = document.createElement('option');
-                    option.value = subject.id;
-                    option.textContent = subject.name;
-                    elements.filterSubject.appendChild(option);
-                });
-            }
         } catch (error) {
             console.error('خطأ في تحديث قوائم المواد:', error);
         }
+
+        // قوائم نموذج "إضافة سؤال" و"إدارة الأسئلة" تُبنى بشكل متسلسل
+        refreshQuestionFormDropdowns();
+        refreshQuestionFilterDropdowns();
     }
-    
+
     // تحديث قوائم الدروس المنسدلة - مع التصفية حسب المادة
     function updateLessonDropdowns(selectedSubject = '') {
-        try {
-            // تحديث قائمة الدروس في إضافة سؤال مع التصفية
-            if (elements.questionLesson) {
-                elements.questionLesson.innerHTML = '<option value="">اختر الدرس (اختياري)</option>';
-                
-                let filteredLessons = lessons;
-                if (selectedSubject) {
-                    // تصفية الدروس حسب المادة المختارة
-                    filteredLessons = lessons.filter(lesson => 
-                        lesson.subjectId === selectedSubject
-                    );
-                }
-                
-                filteredLessons.forEach(lesson => {
-                    const option = document.createElement('option');
-                    option.value = lesson.id;
-                    option.textContent = lesson.name;
-                    elements.questionLesson.appendChild(option);
-                });
-            }
-        } catch (error) {
-            console.error('خطأ في تحديث قوائم الدروس:', error);
-        }
+        // قائمة الدروس في نموذج إضافة سؤال تُبنى داخل السلسلة المتسلسلة
+        refreshQuestionFormDropdowns();
     }
-    
+
     // تحديث قوائم الدروس المنسدلة للأقسام الفرعية
     function updateLessonDropdownsForSublessons() {
         try {
@@ -3701,31 +4612,10 @@
     
     // تحديث قوائم الأقسام الفرعية المنسدلة - مع التصفية حسب الدرس
     function updateSublessonDropdowns(selectedLesson = '') {
-        try {
-            // تحديث قائمة الأقسام الفرعية في إضافة سؤال مع التصفية
-            if (elements.questionSublesson) {
-                elements.questionSublesson.innerHTML = '<option value="">اختر القسم الفرعي (اختياري)</option>';
-                
-                let filteredSublessons = sublessons;
-                if (selectedLesson) {
-                    // تصفية الأقسام الفرعية حسب الدرس المختار
-                    filteredSublessons = sublessons.filter(sublesson => 
-                        sublesson.lessonId === selectedLesson
-                    );
-                }
-                
-                filteredSublessons.forEach(sublesson => {
-                    const option = document.createElement('option');
-                    option.value = sublesson.id;
-                    option.textContent = sublesson.name;
-                    elements.questionSublesson.appendChild(option);
-                });
-            }
-        } catch (error) {
-            console.error('خطأ في تحديث قوائم الأقسام الفرعية:', error);
-        }
+        // قائمة الأقسام الفرعية في نموذج إضافة سؤال تُبنى داخل السلسلة المتسلسلة
+        refreshQuestionFormDropdowns();
     }
-    
+
     // استعادة الحالة المحفوظة
     function restoreSavedState() {
         try {
@@ -3827,6 +4717,11 @@
             elements.adminToggle.addEventListener('click', function() {
                 showPasswordModal();
             });
+
+            // زر الدخول من شاشة الإدارة
+            if (elements.openAdminBtn) {
+                elements.openAdminBtn.addEventListener('click', showPasswordModal);
+            }
             
             // إغلاق لوحة التحكم
             elements.closeAdmin.addEventListener('click', closeAdminPanel);
@@ -3919,12 +4814,81 @@
                 elements.addSublessonBtn.addEventListener('click', addNewSublesson);
             }
             
-            // تصفية الأسئلة في لوحة الإدارة
-            if (elements.filterYear && elements.filterSection) {
-                elements.filterYear.addEventListener('change', loadAllQuestions);
-                elements.filterSection.addEventListener('change', loadAllQuestions);
-                elements.filterSubject.addEventListener('change', loadAllQuestions);
-                elements.filterType.addEventListener('change', loadAllQuestions);
+            // تصفية الأسئلة في لوحة الإدارة (متسلسلة: الصف ← القسم ← المادة ← الدرس)
+            if (elements.filterYear) {
+                elements.filterYear.addEventListener('change', function() {
+                    if (elements.filterSection) elements.filterSection.value = '';
+                    if (elements.filterSubject) elements.filterSubject.value = '';
+                    if (elements.filterLesson) elements.filterLesson.value = '';
+                    refreshQuestionFilterDropdowns();
+                    renderAdminQuestions();
+                });
+            }
+
+            if (elements.filterSection) {
+                elements.filterSection.addEventListener('change', function() {
+                    if (elements.filterSubject) elements.filterSubject.value = '';
+                    if (elements.filterLesson) elements.filterLesson.value = '';
+                    refreshQuestionFilterDropdowns();
+                    renderAdminQuestions();
+                });
+            }
+
+            if (elements.filterSubject) {
+                elements.filterSubject.addEventListener('change', function() {
+                    if (elements.filterLesson) elements.filterLesson.value = '';
+                    refreshQuestionFilterDropdowns();
+                    renderAdminQuestions();
+                });
+            }
+
+            if (elements.filterLesson) {
+                elements.filterLesson.addEventListener('change', renderAdminQuestions);
+            }
+
+            if (elements.filterType) {
+                elements.filterType.addEventListener('change', renderAdminQuestions);
+            }
+
+            // البحث داخل الأسئلة والأقسام والمواد والدروس والأقسام الفرعية
+            bindSearchInput(elements.questionsSearch, renderAdminQuestions);
+            bindSearchInput(elements.sectionsSearch, loadSectionsForAdmin);
+            bindSearchInput(elements.subjectsSearch, loadSubjectsForAdmin);
+            bindSearchInput(elements.lessonsSearch, loadLessonsForAdmin);
+            bindSearchInput(elements.sublessonsSearch, loadSublessonsForAdmin);
+
+            // أزرار مسح البحث
+            document.querySelectorAll('.search-clear').forEach(button => {
+                button.addEventListener('click', function() {
+                    const input = document.getElementById(this.dataset.clear);
+                    if (!input) return;
+                    input.value = '';
+                    input.dispatchEvent(new Event('input'));
+                    input.focus();
+                });
+            });
+
+            // زر الوضع الليلي داخل لوحة التحكم
+            if (elements.adminThemeToggle) {
+                elements.adminThemeToggle.addEventListener('click', toggleDarkMode);
+            }
+
+            // شريط الأيقونات الجانبي: تلميحات + توسيع/طي
+            elements.adminNavItems.forEach(item => {
+                const label = item.querySelector('span');
+                if (label) item.setAttribute('data-label', label.textContent.trim());
+            });
+
+            if (elements.navToggle && elements.adminPanel) {
+                // استعادة حالة القائمة المحفوظة
+                if (localStorage.getItem('adminNavExpanded') === 'true') {
+                    elements.adminPanel.classList.add('nav-expanded');
+                }
+
+                elements.navToggle.addEventListener('click', function() {
+                    const expanded = elements.adminPanel.classList.toggle('nav-expanded');
+                    localStorage.setItem('adminNavExpanded', expanded);
+                });
             }
             
             // إدارة الإعلانات
@@ -3973,65 +4937,17 @@
             if (elements.restoreBackupBtn) {
                 elements.restoreBackupBtn.addEventListener('click', restoreBackup);
             }
-            
-            // تحديث القوائم المنسدلة عند تغيير الصف في إضافة سؤال
-            if (elements.questionYear) {
-                elements.questionYear.addEventListener('change', function() {
-                    const selectedYear = this.value;
-                    // تصفية الأقسام حسب الصف المختار
-                    updateSectionDropdowns(selectedYear);
-                    // إعادة تعيين القسم والمادة والدرس والقسم الفرعي
-                    elements.questionSection.value = '';
-                    elements.questionSubject.value = '';
-                    elements.questionLesson.value = '';
-                    elements.questionSublesson.value = '';
-                    // تحديث قائمة المواد (ستظهر عند اختيار قسم)
-                    updateSubjectDropdowns('');
-                    updateLessonDropdowns('');
-                    updateSublessonDropdowns('');
-                });
+
+            const restoreAutoBtn = document.getElementById('restore-auto-backup-btn');
+            if (restoreAutoBtn) {
+                restoreAutoBtn.addEventListener('click', restoreAutoBackup);
             }
             
-            // تحديث القوائم المنسدلة عند تغيير القسم في إضافة سؤال
-            if (elements.questionSection) {
-                elements.questionSection.addEventListener('change', function() {
-                    const selectedSection = this.value;
-                    // تصفية المواد حسب القسم المختار
-                    updateSubjectDropdowns(selectedSection);
-                    // إعادة تعيين المادة والدرس والقسم الفرعي
-                    elements.questionSubject.value = '';
-                    elements.questionLesson.value = '';
-                    elements.questionSublesson.value = '';
-                    // تحديث قائمة الدروس (ستظهر عند اختيار مادة)
-                    updateLessonDropdowns('');
-                    updateSublessonDropdowns('');
-                });
-            }
-            
-            // تحديث القوائم المنسدلة عند تغيير المادة في إضافة سؤال
-            if (elements.questionSubject) {
-                elements.questionSubject.addEventListener('change', function() {
-                    const selectedSubject = this.value;
-                    // تصفية الدروس حسب المادة المختارة
-                    updateLessonDropdowns(selectedSubject);
-                    // إعادة تعيين الدرس والقسم الفرعي
-                    elements.questionLesson.value = '';
-                    elements.questionSublesson.value = '';
-                    // تحديث قائمة الأقسام الفرعية (ستظهر عند اختيار درس)
-                    updateSublessonDropdowns('');
-                });
-            }
-            
-            // تحديث القوائم المنسدلة عند تغيير الدرس في إضافة سؤال
-            if (elements.questionLesson) {
-                elements.questionLesson.addEventListener('change', function() {
-                    const selectedLesson = this.value;
-                    // تصفية الأقسام الفرعية حسب الدرس المختار
-                    updateSublessonDropdowns(selectedLesson);
-                    // إعادة تعيين القسم الفرعي
-                    elements.questionSublesson.value = '';
-                });
-            }
+            // سلسلة نموذج إضافة سؤال: كل تغيير يفرّغ الخطوات التالية ويعيد بناءها
+            bindTaxonomyChain(questionFormSelects(), updateQuestionFormSteps);
+
+            // بناء الحالة الابتدائية للنموذج (القسم/المادة/الدرس معطّلة حتى يُختار الصف)
+            refreshQuestionFormDropdowns();
         } catch (error) {
             console.error('خطأ في إعداد مستمعي الأحداث:', error);
         }
@@ -4336,91 +5252,356 @@
     }
     
     // تحميل جميع الأسئلة للإدارة
+    let adminQuestionsCache = [];
+    let adminQuestionsBound = false;
+
+    // تعبئة قائمة منسدلة مع الحفاظ على الاختيار السابق إن ظل متاحًا
+    function fillSelect(select, items, placeholder, previousValue) {
+        if (!select) return;
+        select.innerHTML = '';
+        const placeholderOption = document.createElement('option');
+        placeholderOption.value = '';
+        placeholderOption.textContent = placeholder;
+        select.appendChild(placeholderOption);
+
+        items.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.id;
+            option.textContent = item.name || item.id;
+            select.appendChild(option);
+        });
+
+        select.value = (previousValue && items.some(item => item.id === previousValue)) ? previousValue : '';
+    }
+
+    // بناء سلسلة (الصف ← القسم ← المادة ← الدرس ← القسم الفرعي) على أي مجموعة قوائم منسدلة.
+    // preset: قيم محفوظة تُستخدم كاختيار مبدئي عند أول بناء (للتعديل)، وتُهمل إن لم تعد متاحة.
+    function refreshTaxonomyChain(selects, preset = null) {
+        try {
+            const yearSelect = selects.year;
+            const sectionSelect = selects.section;
+            const subjectSelect = selects.subject;
+            const lessonSelect = selects.lesson;
+            const sublessonSelect = selects.sublesson;
+            if (!yearSelect || !sectionSelect || !subjectSelect) return;
+
+            // الاختيار الحالي، وإن كان فارغًا نرجع للقيمة المحفوظة (إن وُجدت)
+            const wanted = (select, key) => (select && select.value) ? select.value : ((preset && preset[key]) || '');
+
+            // 1) الصف الدراسي → الأقسام المرتبطة بهذا الصف فقط
+            // (الإسناد ثم القراءة: لو كانت القيمة المحفوظة غير موجودة في الخيارات تعود فارغة)
+            yearSelect.value = wanted(yearSelect, 'year');
+            const year = yearSelect.value;
+            const availableSections = year
+                ? sections.filter(section => Array.isArray(section.grades) && section.grades.includes(year))
+                : [];
+            fillSelect(sectionSelect, availableSections, year ? 'اختر القسم' : 'اختر الصف أولًا', wanted(sectionSelect, 'section'));
+            sectionSelect.disabled = !year;
+
+            // 2) القسم → المواد التابعة له فقط
+            const sectionId = sectionSelect.value;
+            const availableSubjects = sectionId
+                ? subjects.filter(subject => subject.sectionId === sectionId)
+                : [];
+            fillSelect(subjectSelect, availableSubjects, sectionId ? 'اختر المادة' : 'اختر القسم أولًا', wanted(subjectSelect, 'subject'));
+            subjectSelect.disabled = !sectionId;
+
+            // 3) المادة → الدروس التابعة لها فقط
+            const subjectId = subjectSelect.value;
+            if (lessonSelect) {
+                const availableLessons = subjectId
+                    ? lessons.filter(lesson => lesson.subjectId === subjectId)
+                    : [];
+                fillSelect(lessonSelect, availableLessons, subjectId ? 'اختر الدرس (اختياري)' : 'اختر المادة أولًا', wanted(lessonSelect, 'lesson'));
+                lessonSelect.disabled = !subjectId;
+            }
+
+            // 4) الدرس → الأقسام الفرعية التابعة له فقط
+            const lessonId = lessonSelect ? lessonSelect.value : '';
+            if (sublessonSelect) {
+                const availableSublessons = lessonId
+                    ? sublessons.filter(sublesson => sublesson.lessonId === lessonId)
+                    : [];
+                fillSelect(sublessonSelect, availableSublessons, lessonId ? 'اختر القسم الفرعي (اختياري)' : 'اختر الدرس أولًا', wanted(sublessonSelect, 'sublesson'));
+                sublessonSelect.disabled = !lessonId;
+            }
+        } catch (error) {
+            console.error('خطأ في بناء سلسلة الصف/القسم/المادة:', error);
+        }
+    }
+
+    // ربط قوائم السلسلة: أي تغيير يفرّغ الخطوات التالية ثم يعيد بناء السلسلة
+    function bindTaxonomyChain(selects, afterChange) {
+        const chain = [selects.year, selects.section, selects.subject, selects.lesson, selects.sublesson];
+        chain.forEach((select, index) => {
+            if (!select) return;
+            select.addEventListener('change', function() {
+                chain.slice(index + 1).forEach(next => {
+                    if (next) next.value = '';
+                });
+                refreshTaxonomyChain(selects);
+                if (afterChange) afterChange();
+            });
+        });
+    }
+
+    // قوائم نموذج "إضافة سؤال"
+    function questionFormSelects() {
+        return {
+            year: elements.questionYear,
+            section: elements.questionSection,
+            subject: elements.questionSubject,
+            lesson: elements.questionLesson,
+            sublesson: elements.questionSublesson
+        };
+    }
+
+    // بناء قوائم نموذج "إضافة سؤال" بشكل متسلسل
+    function refreshQuestionFormDropdowns() {
+        refreshTaxonomyChain(questionFormSelects());
+        updateQuestionFormSteps();
+    }
+
+    // تحديث مؤشر خطوات نموذج إضافة سؤال (الصف ← القسم ← المادة ← الدرس ← القسم الفرعي)
+    function updateQuestionFormSteps() {
+        try {
+            const val = el => (el ? el.value : '');
+            const steps = [
+                { el: elements.qStepYear, value: val(elements.questionYear), label: 'الصف الدراسي', text: getYearText(val(elements.questionYear)) },
+                { el: elements.qStepSection, value: val(elements.questionSection), label: 'القسم', text: getEntityName(sections, val(elements.questionSection)) },
+                { el: elements.qStepSubject, value: val(elements.questionSubject), label: 'المادة', text: getEntityName(subjects, val(elements.questionSubject)) },
+                { el: elements.qStepLesson, value: val(elements.questionLesson), label: 'الدرس', text: getEntityName(lessons, val(elements.questionLesson)) },
+                { el: elements.qStepSublesson, value: val(elements.questionSublesson), label: 'القسم الفرعي', text: getEntityName(sublessons, val(elements.questionSublesson)) }
+            ];
+
+            steps.forEach(step => {
+                if (!step.el) return;
+                const valueEl = step.el.querySelector('.step-value');
+                if (step.value) {
+                    step.el.classList.add('done');
+                    if (valueEl) valueEl.textContent = step.text || step.label;
+                } else {
+                    step.el.classList.remove('done');
+                    if (valueEl) valueEl.textContent = step.label;
+                }
+            });
+        } catch (error) {
+            console.error('خطأ في تحديث خطوات نموذج إضافة سؤال:', error);
+        }
+    }
+
+    // بناء قوائم التصفية بشكل متسلسل: الصف ← القسم ← المادة ← الدرس
+    function refreshQuestionFilterDropdowns() {
+        try {
+            const yearSelect = elements.filterYear;
+            const sectionSelect = elements.filterSection;
+            const subjectSelect = elements.filterSubject;
+            const lessonSelect = elements.filterLesson;
+            if (!yearSelect || !sectionSelect || !subjectSelect) return;
+
+            const year = yearSelect.value;
+            const availableSections = year
+                ? sections.filter(section => Array.isArray(section.grades) && section.grades.includes(year))
+                : [];
+            fillSelect(sectionSelect, availableSections, year ? 'اختر القسم' : 'اختر الصف أولًا', sectionSelect.value);
+            sectionSelect.disabled = !year;
+
+            const sectionId = sectionSelect.value;
+            const availableSubjects = sectionId
+                ? subjects.filter(subject => subject.sectionId === sectionId)
+                : [];
+            fillSelect(subjectSelect, availableSubjects, sectionId ? 'اختر المادة' : 'اختر القسم أولًا', subjectSelect.value);
+            subjectSelect.disabled = !sectionId;
+
+            const subjectId = subjectSelect.value;
+            if (lessonSelect) {
+                const availableLessons = subjectId
+                    ? lessons.filter(lesson => lesson.subjectId === subjectId)
+                    : [];
+                fillSelect(lessonSelect, availableLessons, 'كل الدروس', lessonSelect.value);
+                lessonSelect.disabled = !subjectId;
+            }
+
+            updateFilterSteps();
+        } catch (error) {
+            console.error('خطأ في تحديث قوائم تصفية الأسئلة:', error);
+        }
+    }
+
+    // تحديث مؤشر الخطوات (الصف ← القسم ← المادة)
+    function updateFilterSteps() {
+        try {
+            const steps = [
+                { el: elements.stepYear, value: elements.filterYear ? elements.filterYear.value : '', label: 'الصف الدراسي', text: getYearText(elements.filterYear ? elements.filterYear.value : '') },
+                { el: elements.stepSection, value: elements.filterSection ? elements.filterSection.value : '', label: 'القسم', text: getEntityName(sections, elements.filterSection ? elements.filterSection.value : '') },
+                { el: elements.stepSubject, value: elements.filterSubject ? elements.filterSubject.value : '', label: 'المادة', text: getEntityName(subjects, elements.filterSubject ? elements.filterSubject.value : '') }
+            ];
+
+            steps.forEach(step => {
+                if (!step.el) return;
+                const valueEl = step.el.querySelector('.step-value');
+                if (step.value) {
+                    step.el.classList.add('done');
+                    if (valueEl) valueEl.textContent = step.text || step.label;
+                } else {
+                    step.el.classList.remove('done');
+                    if (valueEl) valueEl.textContent = step.label;
+                }
+            });
+        } catch (error) {
+            console.error('خطأ في تحديث خطوات التصفية:', error);
+        }
+    }
+
+    // الحصول على اسم عنصر من مصفوفة بالمعرف
+    function getEntityName(list, id) {
+        if (!id) return '';
+        const found = (list || []).find(item => item.id === id);
+        return found ? (found.name || id) : id;
+    }
+
+    // تحميل الأسئلة للإدارة (يتم الاشتراك مرة واحدة ثم العرض من الذاكرة)
     function loadAllQuestions() {
         try {
-            const questionsRef = database.ref('questions');
-            questionsRef.once('value', (snapshot) => {
-                elements.allQuestionsList.innerHTML = '';
-                
-                const filterYear = elements.filterYear.value;
-                const filterSection = elements.filterSection.value;
-                const filterSubject = elements.filterSubject.value;
-                const filterType = elements.filterType.value;
-                
-                let hasQuestions = false;
-                
-                snapshot.forEach((childSnapshot) => {
-                    const question = childSnapshot.val();
-                    question.id = childSnapshot.key;
-                    
-                    // تطبيق التصفية
-                    if ((!filterYear || question.year === filterYear) && 
-                        (!filterSection || question.section === filterSection) &&
-                        (!filterSubject || question.subject === filterSubject) &&
-                        (!filterType || question.type === filterType)) {
-                        
-                        hasQuestions = true;
-                        const sectionName = sections.find(s => s.id === question.section)?.name || question.section;
-                        const subjectName = subjects.find(s => s.id === question.subject)?.name || question.subject || 'عام';
-                        const lessonName = lessons.find(l => l.id === question.lesson)?.name || '';
-                        const sublessonName = sublessons.find(s => s.id === question.sublesson)?.name || '';
-                        
-                        const questionItem = document.createElement('div');
-                        questionItem.className = 'question-item';
-                        questionItem.innerHTML = `
-                            <h4>${question.text}</h4>
-                            <div class="question-meta">
-                                <span><i class="fas fa-graduation-cap"></i> ${getYearText(question.year)}</span>
-                                <span><i class="fas fa-layer-group"></i> ${sectionName}</span>
-                                <span><i class="fas fa-book"></i> ${subjectName}</span>
-                                ${lessonName ? `<span><i class="fas fa-book-open"></i> ${lessonName}</span>` : ''}
-                                ${sublessonName ? `<span><i class="fas fa-folder"></i> ${sublessonName}</span>` : ''}
-                                <span><i class="fas fa-${question.type === 'mcq' ? 'list' : 'check'}"></i> ${question.type === 'mcq' ? 'اختيار من متعدد' : 'صح أم خطأ'}</span>
-                            </div>
-                            <div class="options-list">
-                                ${question.type === 'mcq' ? `
-                                    <div class="option-item ${question.correctAnswer === '1' ? 'correct-option' : ''}">1. ${question.option1}</div>
-                                    <div class="option-item ${question.correctAnswer === '2' ? 'correct-option' : ''}">2. ${question.option2}</div>
-                                    ${question.option3 ? `<div class="option-item ${question.correctAnswer === '3' ? 'correct-option' : ''}">3. ${question.option3}</div>` : ''}
-                                    ${question.option4 ? `<div class="option-item ${question.correctAnswer === '4' ? 'correct-option' : ''}">4. ${question.option4}</div>` : ''}
-                                ` : `
-                                    <div class="option-item ${question.correctAnswer === 'true' ? 'correct-option' : ''}">${question.correctAnswer === 'true' ? 'صح' : 'خطأ'}</div>
-                                `}
-                            </div>
-                            <div class="question-actions">
-                                <button class="btn-admin btn-admin-warning btn-sm" onclick="editQuestion('${question.id}')">
-                                    <i class="fas fa-edit"></i> تعديل
-                                </button>
-                                <button class="btn-admin btn-admin-danger btn-sm" onclick="deleteQuestion('${question.id}')">
-                                    <i class="fas fa-trash"></i> حذف
-                                </button>
-                            </div>
-                        `;
-                        
-                        elements.allQuestionsList.appendChild(questionItem);
-                    }
+            if (!adminQuestionsBound) {
+                adminQuestionsBound = true;
+                database.ref('questions').on('value', (snapshot) => {
+                    adminQuestionsCache = [];
+                    snapshot.forEach((childSnapshot) => {
+                        const question = childSnapshot.val() || {};
+                        question.id = childSnapshot.key;
+                        adminQuestionsCache.push(question);
+                    });
+                    renderAdminQuestions();
+                    updateAdminStats();
+                }, (error) => {
+                    console.error('خطأ في تحميل الأسئلة للإدارة:', error);
+                    showError('حدث خطأ في تحميل الأسئلة للإدارة');
                 });
-                
-                if (!hasQuestions) {
-                    elements.allQuestionsList.innerHTML = `
-                        <div class="no-questions">
-                            <i class="fas fa-info-circle"></i>
-                            <h3>لا توجد أسئلة متطابقة مع معايير التصفية</h3>
-                            <p>حاول تغيير معايير التصفية أو أضف أسئلة جديدة.</p>
-                        </div>
-                    `;
-                }
-                
-                // تحديث الإحصائيات
-                updateAdminStats();
-            }, (error) => {
-                console.error('خطأ في تحميل الأسئلة للإدارة:', error);
-                showError('حدث خطأ في تحميل الأسئلة للإدارة');
-            });
+                return;
+            }
+
+            renderAdminQuestions();
         } catch (error) {
             console.error('خطأ في دالة تحميل الأسئلة للإدارة:', error);
             showError('حدث خطأ في تحميل الأسئلة للإدارة');
         }
+    }
+
+    // مطابقة السؤال مع كلمة البحث
+    function questionMatchesTerm(question, term) {
+        if (!term) return true;
+        const haystack = [
+            question.text,
+            question.option1,
+            question.option2,
+            question.option3,
+            question.option4,
+            question.category
+        ].filter(Boolean).join(' ').toLowerCase();
+        return haystack.includes(term);
+    }
+
+    // عرض الأسئلة بعد اختيار الصف والقسم والمادة
+    function renderAdminQuestions() {
+        try {
+            const list = elements.allQuestionsList;
+            if (!list) return;
+
+            updateFilterSteps();
+
+            const year = elements.filterYear ? elements.filterYear.value : '';
+            const sectionId = elements.filterSection ? elements.filterSection.value : '';
+            const subjectId = elements.filterSubject ? elements.filterSubject.value : '';
+            const lessonId = elements.filterLesson ? elements.filterLesson.value : '';
+            const type = elements.filterType ? elements.filterType.value : '';
+            const term = elements.questionsSearch ? elements.questionsSearch.value.trim().toLowerCase() : '';
+
+            // الأسئلة لا تظهر إلا بعد اختيار الصف والقسم والمادة
+            if (!year || !sectionId || !subjectId) {
+                const missing = !year ? 'الصف الدراسي' : (!sectionId ? 'القسم' : 'المادة');
+                list.innerHTML = `
+                    <div class="admin-empty">
+                        <i class="fas fa-list-check"></i>
+                        <h3>اختر الصف ثم القسم ثم المادة</h3>
+                        <p>لعرض الأسئلة يجب إكمال الاختيار — الخطوة التالية: <strong>${escapeHtml(missing)}</strong></p>
+                    </div>
+                `;
+                updateCountBadge(elements.questionsCount, 0, 'سؤال');
+                return;
+            }
+
+            const filtered = adminQuestionsCache.filter(question =>
+                question.year === year &&
+                question.section === sectionId &&
+                question.subject === subjectId &&
+                (!lessonId || question.lesson === lessonId) &&
+                (!type || question.type === type) &&
+                questionMatchesTerm(question, term)
+            );
+
+            updateCountBadge(elements.questionsCount, filtered.length, 'سؤال');
+
+            if (!filtered.length) {
+                list.innerHTML = `
+                    <div class="admin-empty">
+                        <i class="fas fa-circle-info"></i>
+                        <h3>${term ? 'لا توجد نتائج مطابقة للبحث' : 'لا توجد أسئلة في هذه المادة'}</h3>
+                        <p>${term ? 'جرّب كلمة بحث أخرى أو امسح البحث.' : 'يمكنك إضافة أسئلة جديدة من تبويب «إضافة سؤال».'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = filtered.map(question => {
+                const sectionName = getEntityName(sections, question.section);
+                const subjectName = getEntityName(subjects, question.subject) || 'عام';
+                const lessonName = getEntityName(lessons, question.lesson);
+                const sublessonName = getEntityName(sublessons, question.sublesson);
+                const isMcq = question.type === 'mcq';
+
+                return `
+                    <div class="question-item">
+                        <h4>${escapeHtml(question.text)}</h4>
+                        <div class="question-meta">
+                            <span><i class="fas fa-graduation-cap"></i> ${escapeHtml(getYearText(question.year))}</span>
+                            <span><i class="fas fa-layer-group"></i> ${escapeHtml(sectionName)}</span>
+                            <span><i class="fas fa-book"></i> ${escapeHtml(subjectName)}</span>
+                            ${lessonName ? `<span><i class="fas fa-book-open"></i> ${escapeHtml(lessonName)}</span>` : ''}
+                            ${sublessonName ? `<span><i class="fas fa-folder"></i> ${escapeHtml(sublessonName)}</span>` : ''}
+                            ${question.category ? `<span><i class="fas fa-tag"></i> ${escapeHtml(question.category)}</span>` : ''}
+                            <span><i class="fas fa-${isMcq ? 'list' : 'check'}"></i> ${isMcq ? 'اختيار من متعدد' : 'صح أم خطأ'}</span>
+                        </div>
+                        <div class="options-list">
+                            ${isMcq ? `
+                                <div class="option-item ${question.correctAnswer === '1' ? 'correct-option' : ''}">1. ${escapeHtml(question.option1)}</div>
+                                <div class="option-item ${question.correctAnswer === '2' ? 'correct-option' : ''}">2. ${escapeHtml(question.option2)}</div>
+                                ${question.option3 ? `<div class="option-item ${question.correctAnswer === '3' ? 'correct-option' : ''}">3. ${escapeHtml(question.option3)}</div>` : ''}
+                                ${question.option4 ? `<div class="option-item ${question.correctAnswer === '4' ? 'correct-option' : ''}">4. ${escapeHtml(question.option4)}</div>` : ''}
+                            ` : `
+                                <div class="option-item correct-option">${question.correctAnswer === 'true' ? 'صح' : 'خطأ'}</div>
+                            `}
+                        </div>
+                        <div class="question-actions">
+                            <button class="btn-admin btn-admin-warning btn-sm" onclick="editQuestion('${escapeHtml(question.id)}')">
+                                <i class="fas fa-edit"></i> تعديل
+                            </button>
+                            <button class="btn-admin btn-admin-danger btn-sm" onclick="deleteQuestion('${escapeHtml(question.id)}')">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } catch (error) {
+            console.error('خطأ في عرض الأسئلة للإدارة:', error);
+        }
+    }
+
+    // تحديث عداد أي قائمة
+    function updateCountBadge(element, count, noun) {
+        if (!element) return;
+        element.innerHTML = `<i class="fas fa-hashtag"></i> ${count} ${noun}`;
     }
     
     // تحديث إحصائيات لوحة الإدارة
@@ -4643,172 +5824,208 @@
     }
     
     // تحميل الأقسام للإدارة
+    // قراءة كلمة البحث من حقل معين
+    function getSearchTerm(input) {
+        return input ? input.value.trim().toLowerCase() : '';
+    }
+
+    // ربط حقل بحث بدالة عرض (مع تأخير بسيط وزر مسح)
+    function bindSearchInput(input, renderFn) {
+        if (!input) return;
+        let timer = null;
+        input.addEventListener('input', function() {
+            const wrapper = input.closest('.admin-search');
+            if (wrapper) wrapper.classList.toggle('has-value', input.value.length > 0);
+            clearTimeout(timer);
+            timer = setTimeout(renderFn, 180);
+        });
+    }
+
+    // مطابقة نصوص متعددة مع كلمة البحث
+    function matchesTerm(term, ...values) {
+        if (!term) return true;
+        return values.filter(Boolean).join(' ').toLowerCase().includes(term);
+    }
+
+    // رسالة عند عدم وجود نتائج
+    function emptyListHtml(term, emptyTitle, emptyHint) {
+        return `
+            <div class="admin-empty">
+                <i class="fas fa-circle-info"></i>
+                <h3>${term ? 'لا توجد نتائج مطابقة للبحث' : escapeHtml(emptyTitle)}</h3>
+                <p>${term ? 'جرّب كلمة بحث أخرى أو امسح البحث.' : escapeHtml(emptyHint)}</p>
+            </div>
+        `;
+    }
+
+    // تحميل الأقسام للإدارة (مع البحث)
     function loadSectionsForAdmin() {
         try {
-            const sectionsRef = database.ref('sections');
-            sectionsRef.once('value', (snapshot) => {
-                elements.sectionsList.innerHTML = '';
-                
-                snapshot.forEach((childSnapshot) => {
-                    const section = childSnapshot.val();
-                    section.id = childSnapshot.key;
-                    
-                    const sectionItem = document.createElement('div');
-                    sectionItem.className = 'question-item';
-                    sectionItem.innerHTML = `
-                        <h4><i class="${section.icon}"></i> ${section.name}</h4>
-                        <div class="question-meta">
-                            <span><i class="fas fa-graduation-cap"></i> ${section.grades ? section.grades.map(g => getYearText(g)).join(', ') : 'لم يتم تحديد صفوف'}</span>
-                        </div>
-                        <p>${section.description}</p>
-                        <div class="question-actions">
-                            <button class="btn-admin btn-admin-warning btn-sm" onclick="editSection('${section.id}')">
-                                <i class="fas fa-edit"></i> تعديل
-                            </button>
-                            <button class="btn-admin btn-admin-danger btn-sm" onclick="deleteSection('${section.id}')">
-                                <i class="fas fa-trash"></i> حذف
-                            </button>
-                        </div>
-                    `;
-                    
-                    elements.sectionsList.appendChild(sectionItem);
-                });
-            }, (error) => {
-                console.error('خطأ في تحميل الأقسام للإدارة:', error);
-            });
+            const list = elements.sectionsList;
+            if (!list) return;
+
+            const term = getSearchTerm(elements.sectionsSearch);
+            const filtered = sections.filter(section => matchesTerm(term, section.name, section.description));
+            updateCountBadge(elements.sectionsCount, filtered.length, 'قسم');
+
+            if (!filtered.length) {
+                list.innerHTML = emptyListHtml(term, 'لا توجد أقسام', 'أضف قسمًا جديدًا من النموذج بالأعلى.');
+                return;
+            }
+
+            list.innerHTML = filtered.map(section => `
+                <div class="question-item">
+                    <h4><i class="${escapeHtml(section.icon || 'fas fa-layer-group')}"></i> ${escapeHtml(section.name)}</h4>
+                    <div class="question-meta">
+                        <span><i class="fas fa-graduation-cap"></i> ${Array.isArray(section.grades) && section.grades.length ? escapeHtml(section.grades.map(g => getYearText(g)).join('، ')) : 'لم يتم تحديد صفوف'}</span>
+                        <span><i class="fas fa-book"></i> ${subjects.filter(s => s.sectionId === section.id).length} مادة</span>
+                    </div>
+                    <p>${escapeHtml(section.description || '')}</p>
+                    <div class="question-actions">
+                        <button class="btn-admin btn-admin-warning btn-sm" onclick="editSection('${escapeHtml(section.id)}')">
+                            <i class="fas fa-edit"></i> تعديل
+                        </button>
+                        <button class="btn-admin btn-admin-danger btn-sm" onclick="deleteSection('${escapeHtml(section.id)}')">
+                            <i class="fas fa-trash"></i> حذف
+                        </button>
+                    </div>
+                </div>
+            `).join('');
         } catch (error) {
-            console.error('خطأ في دالة تحميل الأقسام للإدارة:', error);
+            console.error('خطأ في عرض الأقسام للإدارة:', error);
         }
     }
-    
-    // تحميل المواد للإدارة
+
+    // تحميل المواد للإدارة (مع البحث)
     function loadSubjectsForAdmin() {
         try {
-            const subjectsRef = database.ref('subjects');
-            subjectsRef.once('value', (snapshot) => {
-                elements.subjectsList.innerHTML = '';
-                
-                snapshot.forEach((childSnapshot) => {
-                    const subject = childSnapshot.val();
-                    subject.id = childSnapshot.key;
-                    
-                    const sectionName = sections.find(s => s.id === subject.sectionId)?.name || subject.sectionId;
-                    
-                    const subjectItem = document.createElement('div');
-                    subjectItem.className = 'question-item';
-                    subjectItem.innerHTML = `
-                        <h4><i class="fas ${subject.icon}"></i> ${subject.name}</h4>
-                        <div class="question-meta">
-                            <span><i class="fas fa-layer-group"></i> ${sectionName}</span>
-                        </div>
-                        <p>${subject.description}</p>
-                        <div class="question-actions">
-                            <button class="btn-admin btn-admin-warning btn-sm" onclick="editSubject('${subject.id}')">
-                                <i class="fas fa-edit"></i> تعديل
-                            </button>
-                            <button class="btn-admin btn-admin-danger btn-sm" onclick="deleteSubject('${subject.id}')">
-                                <i class="fas fa-trash"></i> حذف
-                            </button>
-                        </div>
-                    `;
-                    
-                    elements.subjectsList.appendChild(subjectItem);
-                });
-            }, (error) => {
-                console.error('خطأ في تحميل المواد للإدارة:', error);
-            });
+            const list = elements.subjectsList;
+            if (!list) return;
+
+            const term = getSearchTerm(elements.subjectsSearch);
+            const filtered = subjects.filter(subject =>
+                matchesTerm(term, subject.name, subject.description, getEntityName(sections, subject.sectionId))
+            );
+            updateCountBadge(elements.subjectsCount, filtered.length, 'مادة');
+
+            if (!filtered.length) {
+                list.innerHTML = emptyListHtml(term, 'لا توجد مواد', 'أضف مادة جديدة من النموذج بالأعلى.');
+                return;
+            }
+
+            list.innerHTML = filtered.map(subject => `
+                <div class="question-item">
+                    <h4><i class="fas ${escapeHtml(subject.icon || 'fa-book')}"></i> ${escapeHtml(subject.name)}</h4>
+                    <div class="question-meta">
+                        <span><i class="fas fa-layer-group"></i> ${escapeHtml(getEntityName(sections, subject.sectionId) || 'بدون قسم')}</span>
+                        <span><i class="fas fa-book-open"></i> ${lessons.filter(l => l.subjectId === subject.id).length} درس</span>
+                    </div>
+                    <p>${escapeHtml(subject.description || '')}</p>
+                    <div class="question-actions">
+                        <button class="btn-admin btn-admin-warning btn-sm" onclick="editSubject('${escapeHtml(subject.id)}')">
+                            <i class="fas fa-edit"></i> تعديل
+                        </button>
+                        <button class="btn-admin btn-admin-danger btn-sm" onclick="deleteSubject('${escapeHtml(subject.id)}')">
+                            <i class="fas fa-trash"></i> حذف
+                        </button>
+                    </div>
+                </div>
+            `).join('');
         } catch (error) {
-            console.error('خطأ في دالة تحميل المواد للإدارة:', error);
+            console.error('خطأ في عرض المواد للإدارة:', error);
         }
     }
-    
-    // تحميل الدروس للإدارة
+
+    // تحميل الدروس للإدارة (مع البحث)
     function loadLessonsForAdmin() {
         try {
-            const lessonsRef = database.ref('lessons');
-            lessonsRef.once('value', (snapshot) => {
-                const lessonsList = document.getElementById('lessons-list');
-                if (!lessonsList) return;
-                
-                lessonsList.innerHTML = '';
-                
-                snapshot.forEach((childSnapshot) => {
-                    const lesson = childSnapshot.val();
-                    lesson.id = childSnapshot.key;
-                    
-                    const subjectName = subjects.find(s => s.id === lesson.subjectId)?.name || lesson.subjectId;
-                    
-                    const lessonItem = document.createElement('div');
-                    lessonItem.className = 'question-item';
-                    lessonItem.innerHTML = `
-                        <h4><i class="fas ${lesson.icon}"></i> ${lesson.name}</h4>
-                        <div class="question-meta">
-                            <span><i class="fas fa-book"></i> ${subjectName}</span>
-                            <span><i class="fas fa-sort-numeric-up"></i> الترتيب: ${lesson.order || 1}</span>
-                        </div>
-                        <p>${lesson.description}</p>
-                        <div class="question-actions">
-                            <button class="btn-admin btn-admin-warning btn-sm" onclick="editLesson('${lesson.id}')">
-                                <i class="fas fa-edit"></i> تعديل
-                            </button>
-                            <button class="btn-admin btn-admin-danger btn-sm" onclick="deleteLesson('${lesson.id}')">
-                                <i class="fas fa-trash"></i> حذف
-                            </button>
-                        </div>
-                    `;
-                    
-                    lessonsList.appendChild(lessonItem);
-                });
-            }, (error) => {
-                console.error('خطأ في تحميل الدروس للإدارة:', error);
-            });
+            const list = document.getElementById('lessons-list');
+            if (!list) return;
+
+            const term = getSearchTerm(elements.lessonsSearch);
+            const filtered = lessons
+                .filter(lesson => matchesTerm(term, lesson.name, lesson.description, getEntityName(subjects, lesson.subjectId)))
+                .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+            updateCountBadge(elements.lessonsCount, filtered.length, 'درس');
+
+            if (!filtered.length) {
+                list.innerHTML = emptyListHtml(term, 'لا توجد دروس', 'أضف درسًا جديدًا من النموذج بالأعلى.');
+                return;
+            }
+
+            list.innerHTML = filtered.map(lesson => `
+                <div class="question-item">
+                    <h4><i class="fas ${escapeHtml(lesson.icon || 'fa-book-open')}"></i> ${escapeHtml(lesson.name)}</h4>
+                    <div class="question-meta">
+                        <span><i class="fas fa-book"></i> ${escapeHtml(getEntityName(subjects, lesson.subjectId) || 'بدون مادة')}</span>
+                        <span><i class="fas fa-folder"></i> ${sublessons.filter(s => s.lessonId === lesson.id).length} قسم فرعي</span>
+                        <span><i class="fas fa-sort-numeric-up"></i> الترتيب: ${escapeHtml(lesson.order || 1)}</span>
+                    </div>
+                    <p>${escapeHtml(lesson.description || '')}</p>
+                    <div class="question-actions">
+                        <button class="btn-admin btn-admin-warning btn-sm" onclick="editLesson('${escapeHtml(lesson.id)}')">
+                            <i class="fas fa-edit"></i> تعديل
+                        </button>
+                        <button class="btn-admin btn-admin-danger btn-sm" onclick="deleteLesson('${escapeHtml(lesson.id)}')">
+                            <i class="fas fa-trash"></i> حذف
+                        </button>
+                    </div>
+                </div>
+            `).join('');
         } catch (error) {
-            console.error('خطأ في دالة تحميل الدروس للإدارة:', error);
+            console.error('خطأ في عرض الدروس للإدارة:', error);
         }
     }
-    
-    // تحميل الأقسام الفرعية للإدارة
+
+    // تحميل الأقسام الفرعية للإدارة (مع البحث)
     function loadSublessonsForAdmin() {
         try {
-            const sublessonsRef = database.ref('sublessons');
-            sublessonsRef.once('value', (snapshot) => {
-                const sublessonsList = document.getElementById('sublessons-list');
-                if (!sublessonsList) return;
-                
-                sublessonsList.innerHTML = '';
-                
-                snapshot.forEach((childSnapshot) => {
-                    const sublesson = childSnapshot.val();
-                    sublesson.id = childSnapshot.key;
-                    
-                    const lessonName = lessons.find(l => l.id === sublesson.lessonId)?.name || sublesson.lessonId;
-                    
-                    const sublessonItem = document.createElement('div');
-                    sublessonItem.className = 'question-item';
-                    sublessonItem.innerHTML = `
-                        <h4><i class="fas ${sublesson.icon}"></i> ${sublesson.name}</h4>
-                        <div class="question-meta">
-                            <span><i class="fas fa-book-open"></i> ${lessonName}</span>
-                            <span><i class="fas fa-sort-numeric-up"></i> الترتيب: ${sublesson.order || 1}</span>
-                        </div>
-                        <p>${sublesson.description}</p>
-                        <div class="question-actions">
-                            <button class="btn-admin btn-admin-warning btn-sm" onclick="editSublesson('${sublesson.id}')">
-                                <i class="fas fa-edit"></i> تعديل
-                            </button>
-                            <button class="btn-admin btn-admin-danger btn-sm" onclick="deleteSublesson('${sublesson.id}')">
-                                <i class="fas fa-trash"></i> حذف
-                            </button>
-                        </div>
-                    `;
-                    
-                    sublessonsList.appendChild(sublessonItem);
-                });
-            }, (error) => {
-                console.error('خطأ في تحميل الأقسام الفرعية للإدارة:', error);
-            });
+            const list = document.getElementById('sublessons-list');
+            if (!list) return;
+
+            const term = getSearchTerm(elements.sublessonsSearch);
+            const filtered = sublessons
+                .filter(sublesson => matchesTerm(term, sublesson.name, sublesson.description, getEntityName(lessons, sublesson.lessonId)))
+                .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+            updateCountBadge(elements.sublessonsCount, filtered.length, 'قسم فرعي');
+
+            if (!filtered.length) {
+                list.innerHTML = emptyListHtml(term, 'لا توجد أقسام فرعية', 'أضف قسمًا فرعيًا جديدًا من النموذج بالأعلى.');
+                return;
+            }
+
+            list.innerHTML = filtered.map(sublesson => `
+                <div class="question-item">
+                    <h4><i class="fas ${escapeHtml(sublesson.icon || 'fa-folder')}"></i> ${escapeHtml(sublesson.name)}</h4>
+                    <div class="question-meta">
+                        <span><i class="fas fa-book-open"></i> ${escapeHtml(getEntityName(lessons, sublesson.lessonId) || 'بدون درس')}</span>
+                        <span><i class="fas fa-sort-numeric-up"></i> الترتيب: ${escapeHtml(sublesson.order || 1)}</span>
+                    </div>
+                    <p>${escapeHtml(sublesson.description || '')}</p>
+                    <div class="question-actions">
+                        <button class="btn-admin btn-admin-warning btn-sm" onclick="editSublesson('${escapeHtml(sublesson.id)}')">
+                            <i class="fas fa-edit"></i> تعديل
+                        </button>
+                        <button class="btn-admin btn-admin-danger btn-sm" onclick="deleteSublesson('${escapeHtml(sublesson.id)}')">
+                            <i class="fas fa-trash"></i> حذف
+                        </button>
+                    </div>
+                </div>
+            `).join('');
         } catch (error) {
-            console.error('خطأ في دالة تحميل الأقسام الفرعية للإدارة:', error);
+            console.error('خطأ في عرض الأقسام الفرعية للإدارة:', error);
+        }
+    }
+
+    // تحديث إحصائيات المحتوى (أقسام / مواد / دروس / أقسام فرعية)
+    function updateContentStats() {
+        try {
+            if (elements.totalSections) elements.totalSections.textContent = sections.length;
+            if (elements.totalSubjects) elements.totalSubjects.textContent = subjects.length;
+            if (elements.totalLessons) elements.totalLessons.textContent = lessons.length;
+            if (elements.totalSublessons) elements.totalSublessons.textContent = sublessons.length;
+        } catch (error) {
+            console.error('خطأ في تحديث إحصائيات المحتوى:', error);
         }
     }
     
@@ -4865,16 +6082,19 @@
     function toggleDarkMode() {
         try {
             isDarkMode = !isDarkMode;
-            
+
+            const icon = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+
             if (isDarkMode) {
                 document.documentElement.setAttribute('data-theme', 'dark');
-                elements.themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
                 localStorage.setItem('darkMode', 'true');
             } else {
                 document.documentElement.removeAttribute('data-theme');
-                elements.themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
                 localStorage.setItem('darkMode', 'false');
             }
+
+            if (elements.themeToggle) elements.themeToggle.innerHTML = icon;
+            if (elements.adminThemeToggle) elements.adminThemeToggle.innerHTML = icon;
         } catch (error) {
             console.error('خطأ في تبديل وضع Dark Mode:', error);
         }
@@ -5240,18 +6460,20 @@
         try {
             if (elements.passwordInput.value === adminPassword) {
                 elements.passwordModal.style.display = 'none';
-                elements.adminPanel.style.display = 'block';
+                // لا يتم تعيين display هنا حتى لا يُلغى تخطيط اللوحة (grid) في وضع الإدارة
                 elements.adminPanel.classList.add('active');
                 elements.overlay.classList.add('active');
                 elements.passwordInput.value = '';
                 elements.passwordError.style.display = 'none';
                 
                 // تحميل بيانات الإدارة
+                refreshQuestionFilterDropdowns();
                 loadAllQuestions();
                 loadSectionsForAdmin();
                 loadSubjectsForAdmin();
                 loadLessonsForAdmin();
                 loadSublessonsForAdmin();
+                updateContentStats();
                 updateUserAnalytics();
             } else {
                 elements.passwordError.style.display = 'block';
@@ -5379,7 +6601,45 @@
                     editModal.innerHTML = `
                         <div class="modal-box">
                             <h3><i class="fas fa-edit"></i> تعديل السؤال</h3>
-                            
+
+                            <div class="form-group">
+                                <label for="edit-question-year">1) الصف الدراسي:</label>
+                                <select id="edit-question-year" class="form-control">
+                                    <option value="">اختر الصف الدراسي</option>
+                                    <option value="prep1">الصف الأول الإعدادي</option>
+                                    <option value="prep2">الصف الثاني الإعدادي</option>
+                                    <option value="prep3">الصف الثالث الإعدادي</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="edit-question-section">2) القسم:</label>
+                                <select id="edit-question-section" class="form-control" disabled>
+                                    <option value="">اختر الصف أولًا</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="edit-question-subject">3) المادة الدراسية:</label>
+                                <select id="edit-question-subject" class="form-control" disabled>
+                                    <option value="">اختر القسم أولًا</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="edit-question-lesson">4) الدرس (اختياري):</label>
+                                <select id="edit-question-lesson" class="form-control" disabled>
+                                    <option value="">اختر المادة أولًا</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="edit-question-sublesson">5) القسم الفرعي (اختياري):</label>
+                                <select id="edit-question-sublesson" class="form-control" disabled>
+                                    <option value="">اختر الدرس أولًا</option>
+                                </select>
+                            </div>
+
                             <div class="form-group">
                                 <label for="edit-question-text">نص السؤال:</label>
                                 <textarea id="edit-question-text" class="form-control" rows="3">${question.text}</textarea>
@@ -5454,54 +6714,6 @@
                                 </select>
                             </div>
                             
-                            <div class="form-group">
-                                <label for="edit-question-year">الصف الدراسي:</label>
-                                <select id="edit-question-year" class="form-control">
-                                    <option value="prep1" ${question.year === 'prep1' ? 'selected' : ''}>الصف الأول الإعدادي</option>
-                                    <option value="prep2" ${question.year === 'prep2' ? 'selected' : ''}>الصف الثاني الإعدادي</option>
-                                    <option value="prep3" ${question.year === 'prep3' ? 'selected' : ''}>الصف الثالث الإعدادي</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="edit-question-section">القسم:</label>
-                                <select id="edit-question-section" class="form-control">
-                                    ${sections.map(section => `
-                                        <option value="${section.id}" ${question.section === section.id ? 'selected' : ''}>${section.name}</option>
-                                    `).join('')}
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="edit-question-subject">المادة الدراسية:</label>
-                                <select id="edit-question-subject" class="form-control">
-                                    <option value="">اختر المادة</option>
-                                    ${subjects.map(subject => `
-                                        <option value="${subject.id}" ${question.subject === subject.id ? 'selected' : ''}>${subject.name}</option>
-                                    `).join('')}
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="edit-question-lesson">الدرس:</label>
-                                <select id="edit-question-lesson" class="form-control">
-                                    <option value="">اختر الدرس (اختياري)</option>
-                                    ${lessons.map(lesson => `
-                                        <option value="${lesson.id}" ${question.lesson === lesson.id ? 'selected' : ''}>${lesson.name}</option>
-                                    `).join('')}
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="edit-question-sublesson">القسم الفرعي:</label>
-                                <select id="edit-question-sublesson" class="form-control">
-                                    <option value="">اختر القسم الفرعي (اختياري)</option>
-                                    ${sublessons.map(sublesson => `
-                                        <option value="${sublesson.id}" ${question.sublesson === sublesson.id ? 'selected' : ''}>${sublesson.name}</option>
-                                    `).join('')}
-                                </select>
-                            </div>
-                            
                             <div class="modal-buttons">
                                 <button class="btn-admin" id="save-edit-btn">
                                     <i class="fas fa-save"></i> حفظ التعديلات
@@ -5519,13 +6731,31 @@
                     editModal.style.display = 'flex';
                     elements.overlay.classList.add('active');
                     
+                    // سلسلة الصف ← القسم ← المادة ← الدرس ← القسم الفرعي داخل نافذة التعديل،
+                    // مع استرجاع القيم المحفوظة للسؤال كاختيار مبدئي إن كانت ما زالت متاحة
+                    const editChainSelects = {
+                        year: editModal.querySelector('#edit-question-year'),
+                        section: editModal.querySelector('#edit-question-section'),
+                        subject: editModal.querySelector('#edit-question-subject'),
+                        lesson: editModal.querySelector('#edit-question-lesson'),
+                        sublesson: editModal.querySelector('#edit-question-sublesson')
+                    };
+                    refreshTaxonomyChain(editChainSelects, {
+                        year: question.year || '',
+                        section: question.section || '',
+                        subject: question.subject || '',
+                        lesson: question.lesson || '',
+                        sublesson: question.sublesson || ''
+                    });
+                    bindTaxonomyChain(editChainSelects);
+
                     // إضافة مستمعي الأحداث
                     const editQuestionType = editModal.querySelector('#edit-question-type');
                     const editMcqOptions = editModal.querySelector('#edit-mcq-options');
                     const editTruefalseOptions = editModal.querySelector('#edit-truefalse-options');
                     const saveEditBtn = editModal.querySelector('#save-edit-btn');
                     const cancelEditBtn = editModal.querySelector('#cancel-edit-btn');
-                    
+
                     // تغيير نوع السؤال
                     editQuestionType.addEventListener('change', function() {
                         try {
@@ -5592,17 +6822,27 @@
             const subject = editModal.querySelector('#edit-question-subject').value;
             const lesson = editModal.querySelector('#edit-question-lesson').value;
             const sublesson = editModal.querySelector('#edit-question-sublesson').value;
-            
+
+            if (!year) {
+                alert('الرجاء اختيار الصف الدراسي أولًا');
+                return;
+            }
+
+            if (!section) {
+                alert('الرجاء اختيار القسم');
+                return;
+            }
+
+            if (!subject) {
+                alert('الرجاء اختيار المادة الدراسية');
+                return;
+            }
+
             if (!questionText) {
                 alert('الرجاء إدخال نص السؤال');
                 return;
             }
-            
-            if (!section) {
-                alert('الرجاء اختيار قسم');
-                return;
-            }
-            
+
             let correctAnswer;
             let questionData = {
                 text: questionText,
@@ -6238,17 +7478,27 @@
             const subject = document.getElementById('question-subject').value;
             const lesson = document.getElementById('question-lesson').value;
             const sublesson = document.getElementById('question-sublesson').value;
-            
+
+            if (!year) {
+                alert('الرجاء اختيار الصف الدراسي أولًا');
+                return;
+            }
+
+            if (!section) {
+                alert('الرجاء اختيار القسم');
+                return;
+            }
+
+            if (!subject) {
+                alert('الرجاء اختيار المادة الدراسية');
+                return;
+            }
+
             if (!questionText) {
                 alert('الرجاء إدخال نص السؤال');
                 return;
             }
-            
-            if (!section) {
-                alert('الرجاء اختيار قسم');
-                return;
-            }
-            
+
             let correctAnswer;
             let questionData = {
                 text: questionText,
@@ -6294,9 +7544,11 @@
                     for (let i = 1; i <= 4; i++) {
                         document.getElementById(`option${i}`).value = '';
                     }
+                    // الاحتفاظ بالصف/القسم/المادة لتسهيل إضافة أسئلة متتابعة، وتفريغ الدرس والقسم الفرعي
                     document.getElementById('question-lesson').value = '';
                     document.getElementById('question-sublesson').value = '';
-                    
+                    refreshQuestionFormDropdowns();
+
                     // إعادة تحميل قائمة الأسئلة
                     loadAllQuestions();
                     createAutoBackup();
@@ -6552,15 +7804,25 @@
         try {
             elements.adminNavItems.forEach(t => t.classList.remove('active'));
             elements.adminTabContents.forEach(c => c.classList.remove('active'));
-            
-            document.querySelector(`.admin-nav-item[data-tab="${tabId}"]`).classList.add('active');
+
+            const navItem = document.querySelector(`.admin-nav-item[data-tab="${tabId}"]`);
+            if (navItem) navItem.classList.add('active');
+
             const tabElement = document.getElementById(`${tabId}-tab`);
             if (tabElement) {
                 tabElement.classList.add('active');
-                
+
+                // إعادة المحتوى لأعلى الصفحة عند تبديل التبويب
+                const content = document.querySelector('.admin-content');
+                if (content) content.scrollTop = 0;
+
                 // تحميل البيانات عند التبديل للتبويب
                 if (tabId === 'manage-questions') {
+                    refreshQuestionFilterDropdowns();
                     loadAllQuestions();
+                } else if (tabId === 'stats') {
+                    updateAdminStats();
+                    updateContentStats();
                 } else if (tabId === 'lessons') {
                     loadLessonsForAdmin();
                 } else if (tabId === 'sublessons') {
@@ -6573,6 +7835,7 @@
                     updateUserAnalytics();
                 } else if (tabId === 'backup') {
                     updateLastBackupInfo();
+                    updateAutoBackupInfo();
                 }
             }
         } catch (error) {
@@ -6688,84 +7951,135 @@
     }
     
     // النسخ الاحتياطي التلقائي
+    // ===== نظام النسخ الاحتياطي الشامل =====
+    // إصدار 2: يحفظ قاعدة البيانات بالكامل + كل الإعدادات المحلية كما هي حرفيًا
+    const BACKUP_VERSION = 2;
+
+    // المسارات المعروفة (تُستخدم كخطة بديلة إذا مُنعت قراءة الجذر)
+    const KNOWN_DB_NODES = [
+        'sections', 'subjects', 'lessons', 'sublessons', 'questions',
+        'ads', 'quizResults', 'examStatus', 'userActivities', 'settings', 'users'
+    ];
+
+    // جمع نسخة كاملة: كل قاعدة البيانات + كل مفاتيح التخزين المحلي
+    function collectFullBackup() {
+        const backup = {
+            version: BACKUP_VERSION,
+            app: 'salah-azhary-prep',
+            timestamp: new Date().toISOString(),
+            database: {},
+            localStorage: {},
+            meta: {}
+        };
+
+        // كل مفاتيح التخزين المحلي (إعدادات، إحصائيات، حالة، إعلان...)
+        try {
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key === 'autoBackup' || key === 'manualBackup') continue; // لا نحفظ نسخة داخل نسخة
+                backup.localStorage[key] = localStorage.getItem(key);
+            }
+        } catch (error) {
+            console.warn('تعذر قراءة التخزين المحلي بالكامل:', error);
+        }
+
+        // قراءة قاعدة البيانات كاملة من الجذر، ومع الفشل نقرأ كل مسار على حدة
+        return database.ref().once('value')
+            .then(snapshot => {
+                backup.database = snapshot.val() || {};
+                backup.meta.source = 'root';
+                return backup;
+            })
+            .catch(rootError => {
+                console.warn('تعذرت قراءة الجذر، سيتم جمع المسارات المعروفة:', rootError);
+                backup.meta.source = 'nodes';
+                backup.meta.rootError = String(rootError && rootError.message ? rootError.message : rootError);
+
+                return Promise.all(KNOWN_DB_NODES.map(node =>
+                    database.ref(node).once('value')
+                        .then(snapshot => ({ node: node, value: snapshot.val() }))
+                        .catch(() => ({ node: node, value: null }))
+                )).then(results => {
+                    results.forEach(result => {
+                        if (result.value !== null && result.value !== undefined) {
+                            backup.database[result.node] = result.value;
+                        }
+                    });
+                    return backup;
+                });
+            });
+    }
+
+    // عدّ العناصر داخل النسخة لعرضها للمشرف
+    function summarizeBackup(backup) {
+        try {
+            const db = (backup && backup.database) || {};
+            const countOf = node => (db[node] && typeof db[node] === 'object') ? Object.keys(db[node]).length : 0;
+            return {
+                questions: countOf('questions'),
+                sections: countOf('sections'),
+                subjects: countOf('subjects'),
+                lessons: countOf('lessons'),
+                sublessons: countOf('sublessons'),
+                quizResults: countOf('quizResults'),
+                nodes: Object.keys(db).length,
+                settingsKeys: Object.keys((backup && backup.localStorage) || {}).length
+            };
+        } catch (error) {
+            return { questions: 0, nodes: 0, settingsKeys: 0 };
+        }
+    }
+
+    // نص مختصر يصف محتوى النسخة
+    function backupSummaryText(backup) {
+        const s = summarizeBackup(backup);
+        return `${s.questions} سؤال • ${s.sections} قسم • ${s.subjects} مادة • ${s.lessons} درس • ${s.sublessons} قسم فرعي • ${s.quizResults} نتيجة • ${s.nodes} مسار • ${s.settingsKeys} إعداد محلي`;
+    }
+
+    // حفظ النسخة التلقائية داخل المتصفح (مع خطة بديلة عند امتلاء التخزين)
+    function saveAutoBackup(backup) {
+        try {
+            localStorage.setItem('autoBackup', JSON.stringify(backup));
+            localStorage.setItem('lastBackup', backup.timestamp);
+            localStorage.setItem('lastBackupSummary', backupSummaryText(backup));
+            updateLastBackupInfo();
+            updateAutoBackupInfo();
+            return true;
+        } catch (error) {
+            console.warn('تعذر حفظ النسخة التلقائية كاملة (مساحة المتصفح ممتلئة)، سيتم حفظ نسخة مختصرة:', error);
+            try {
+                const light = JSON.parse(JSON.stringify(backup));
+                delete light.database.quizResults;
+                delete light.database.userActivities;
+                light.meta.reduced = true;
+                localStorage.setItem('autoBackup', JSON.stringify(light));
+                localStorage.setItem('lastBackup', backup.timestamp);
+                localStorage.setItem('lastBackupSummary', backupSummaryText(light) + ' (نسخة مختصرة)');
+                updateLastBackupInfo();
+                updateAutoBackupInfo();
+                return true;
+            } catch (innerError) {
+                console.error('فشل حفظ النسخة التلقائية:', innerError);
+                return false;
+            }
+        }
+    }
+
+    // نسخة احتياطية تلقائية شاملة
     function createAutoBackup() {
         try {
             if (!autoBackupEnabled) return;
-            
-            console.log('جاري إنشاء نسخة احتياطية تلقائية...');
-            
-            const backupData = {
-                timestamp: new Date().toISOString(),
-                sections: sections,
-                subjects: subjects,
-                lessons: lessons,
-                sublessons: sublessons,
-                userStats: {
-                    totalVisits: userStats.totalVisits,
-                    uniqueUsers: Array.from(userStats.uniqueUsers),
-                    dailyActiveUsers: Array.from(userStats.dailyActiveUsers),
-                    userSessions: userStats.userSessions,
-                    activeUsers: Array.from(userStats.activeUsers),
-                    permanentUsers: Array.from(userStats.permanentUsers),
-                    userActivities: userStats.userActivities
-                },
-                appSettings: {
-                    adminPassword: adminPassword,
-                    examActive: examActive,
-                    defaultExamTime: defaultExamTime,
-                    isDarkMode: isDarkMode,
-                    autoBackupEnabled: autoBackupEnabled
-                }
-            };
-            
-            // احصل على جميع الأسئلة
-            const questionsRef = database.ref('questions');
-            questionsRef.once('value', (snapshot) => {
-                const questions = [];
-                snapshot.forEach((childSnapshot) => {
-                    const question = childSnapshot.val();
-                    question.id = childSnapshot.key;
-                    questions.push(question);
+
+            console.log('جاري إنشاء نسخة احتياطية تلقائية شاملة...');
+
+            collectFullBackup()
+                .then(backup => {
+                    saveAutoBackup(backup);
+                    console.log('تم إنشاء نسخة احتياطية تلقائية:', backupSummaryText(backup));
+                })
+                .catch(error => {
+                    console.error('خطأ في النسخ الاحتياطي التلقائي:', error);
                 });
-                
-                backupData.questions = questions;
-                
-                // احصل على جميع الإعلانات
-                const adsRef = database.ref('ads');
-                adsRef.once('value', (snapshot) => {
-                    if (snapshot.exists()) {
-                        backupData.ad = snapshot.val();
-                    }
-                    
-                    // احصل على جميع النتائج
-                    const resultsRef = database.ref('quizResults');
-                    resultsRef.once('value', (snapshot) => {
-                        const results = [];
-                        snapshot.forEach((childSnapshot) => {
-                            const result = childSnapshot.val();
-                            result.id = childSnapshot.key;
-                            results.push(result);
-                        });
-                        
-                        backupData.quizResults = results;
-                        
-                        // حفظ النسخة الاحتياطية محليًا
-                        localStorage.setItem('autoBackup', JSON.stringify(backupData));
-                        localStorage.setItem('lastBackup', new Date().toISOString());
-                        
-                        console.log('تم إنشاء نسخة احتياطية تلقائية');
-                        
-                        // تحديث معلومات آخر نسخة احتياطية
-                        updateLastBackupInfo();
-                    }, (error) => {
-                        console.error('خطأ في الحصول على النتائج للنسخ الاحتياطي:', error);
-                    });
-                }, (error) => {
-                    console.error('خطأ في الحصول على الإعلانات للنسخ الاحتياطي:', error);
-                });
-            }, (error) => {
-                console.error('خطأ في الحصول على الأسئلة للنسخ الاحتياطي:', error);
-            });
         } catch (error) {
             console.error('خطأ في النسخ الاحتياطي التلقائي:', error);
         }
@@ -6776,99 +8090,35 @@
         try {
             elements.backupStatus.style.display = 'block';
             elements.backupStatus.className = 'backup-status';
-            elements.backupStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري إنشاء النسخة الاحتياطية...';
-            
-            const backupData = {
-                timestamp: new Date().toISOString(),
-                sections: sections,
-                subjects: subjects,
-                lessons: lessons,
-                sublessons: sublessons,
-                userStats: {
-                    totalVisits: userStats.totalVisits,
-                    uniqueUsers: Array.from(userStats.uniqueUsers),
-                    dailyActiveUsers: Array.from(userStats.dailyActiveUsers),
-                    userSessions: userStats.userSessions,
-                    activeUsers: Array.from(userStats.activeUsers),
-                    permanentUsers: Array.from(userStats.permanentUsers),
-                    userActivities: userStats.userActivities
-                },
-                appSettings: {
-                    adminPassword: adminPassword,
-                    examActive: examActive,
-                    defaultExamTime: defaultExamTime,
-                    isDarkMode: isDarkMode,
-                    autoBackupEnabled: autoBackupEnabled
-                }
-            };
-            
-            // احصل على جميع الأسئلة
-            const questionsRef = database.ref('questions');
-            questionsRef.once('value', (snapshot) => {
-                const questions = [];
-                snapshot.forEach((childSnapshot) => {
-                    const question = childSnapshot.val();
-                    question.id = childSnapshot.key;
-                    questions.push(question);
-                });
-                
-                backupData.questions = questions;
-                
-                // احصل على جميع الإعلانات
-                const adsRef = database.ref('ads');
-                adsRef.once('value', (snapshot) => {
-                    if (snapshot.exists()) {
-                        backupData.ad = snapshot.val();
-                    }
-                    
-                    // احصل على جميع النتائج
-                    const resultsRef = database.ref('quizResults');
-                    resultsRef.once('value', (snapshot) => {
-                        const results = [];
-                        snapshot.forEach((childSnapshot) => {
-                            const result = childSnapshot.val();
-                            result.id = childSnapshot.key;
-                            results.push(result);
-                        });
-                        
-                        backupData.quizResults = results;
-                        
-                        // إنشاء ملف JSON للتحميل
-                        const dataStr = JSON.stringify(backupData, null, 2);
-                        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-                        
-                        const exportFileDefaultName = `backup-${new Date().toISOString().split('T')[0]}.json`;
-                        
-                        const linkElement = document.createElement('a');
-                        linkElement.setAttribute('href', dataUri);
-                        linkElement.setAttribute('download', exportFileDefaultName);
-                        linkElement.click();
-                        
-                        // حفظ النسخة محليًا أيضًا
-                        localStorage.setItem('manualBackup', dataStr);
-                        localStorage.setItem('lastBackup', new Date().toISOString());
-                        
-                        elements.backupStatus.className = 'backup-status success';
-                        elements.backupStatus.innerHTML = '<i class="fas fa-check"></i> تم إنشاء النسخة الاحتياطية بنجاح!';
-                        
-                        setTimeout(() => {
-                            elements.backupStatus.style.display = 'none';
-                        }, 3000);
-                        
-                        // تحديث معلومات آخر نسخة احتياطية
-                        updateLastBackupInfo();
-                    }, (error) => {
-                        console.error('خطأ في الحصول على النتائج للنسخ الاحتياطي:', error);
-                        elements.backupStatus.className = 'backup-status error';
-                        elements.backupStatus.innerHTML = '<i class="fas fa-times"></i> حدث خطأ أثناء إنشاء النسخة الاحتياطية';
-                    });
-                }, (error) => {
-                    console.error('خطأ في الحصول على الإعلانات للنسخ الاحتياطي:', error);
-                    elements.backupStatus.className = 'backup-status error';
-                    elements.backupStatus.innerHTML = '<i class="fas fa-times"></i> حدث خطأ أثناء إنشاء النسخة الاحتياطية';
-                });
-            }, (error) => {
-                console.error('خطأ في الحصول على الأسئلة للنسخ الاحتياطي:', error);
+            elements.backupStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري إنشاء نسخة احتياطية شاملة...';
+
+            collectFullBackup().then(backup => {
+                const dataStr = JSON.stringify(backup, null, 2);
+
+                // تنزيل الملف عبر Blob (يدعم الأحجام الكبيرة على عكس data URI)
+                const blob = new Blob([dataStr], { type: 'application/json;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const stamp = backup.timestamp.replace(/[:.]/g, '-').split('T');
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `نسخة-كاملة-${stamp[0]}-${(stamp[1] || '').slice(0, 5)}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(() => URL.revokeObjectURL(url), 4000);
+
+                // حفظ نسخة داخل المتصفح أيضًا كخط دفاع ثانٍ
+                saveAutoBackup(backup);
+
+                const sizeMb = (blob.size / (1024 * 1024)).toFixed(2);
+                elements.backupStatus.className = 'backup-status success';
+                elements.backupStatus.innerHTML = `<i class="fas fa-check"></i> تم إنشاء نسخة شاملة (${sizeMb} ميجابايت)<br><small>${escapeHtml(backupSummaryText(backup))}</small>`;
+
+                setTimeout(() => {
+                    elements.backupStatus.style.display = 'none';
+                }, 8000);
+            }).catch(error => {
+                console.error('خطأ في إنشاء النسخة الاحتياطية:', error);
                 elements.backupStatus.className = 'backup-status error';
                 elements.backupStatus.innerHTML = '<i class="fas fa-times"></i> حدث خطأ أثناء إنشاء النسخة الاحتياطية';
             });
@@ -6904,8 +8154,8 @@
                         throw new Error('ملف النسخة الاحتياطية غير صالح');
                     }
                     
-                    // استعادة البيانات
-                    restoreBackupData(backupData);
+                    // استعادة البيانات (نسخة شاملة أو نسخة قديمة)
+                    applyBackup(backupData);
                 } catch (error) {
                     alert('ملف النسخة الاحتياطية غير صالح أو تالف: ' + error.message);
                 }
@@ -6922,8 +8172,120 @@
         }
     }
     
-    // استعادة بيانات النسخة الاحتياطية - 🔥 تصحيح كامل
-    function restoreBackupData(backupData) {
+    // توجيه الاستعادة حسب نوع النسخة (شاملة أو قديمة)
+    function applyBackup(backupData) {
+        if (backupData && backupData.database && typeof backupData.database === 'object') {
+            restoreFullBackup(backupData);
+        } else {
+            console.log('نسخة بصيغة قديمة — سيتم استخدام الاستعادة التقليدية');
+            restoreLegacyBackupData(backupData);
+        }
+    }
+
+    // استعادة شاملة: إرجاع قاعدة البيانات والإعدادات المحلية كما كانت حرفيًا
+    function restoreFullBackup(backupData) {
+        try {
+            console.log('بدء الاستعادة الشاملة...', backupSummaryText(backupData));
+
+            const nodes = Object.keys(backupData.database);
+            if (!nodes.length) {
+                alert('ملف النسخة الاحتياطية لا يحتوي على أي بيانات');
+                return;
+            }
+
+            // حذف أي مسارات مضافة بعد تاريخ النسخة (إن أمكن قراءة الجذر)
+            const cleanupExtraNodes = database.ref().once('value')
+                .then(snapshot => {
+                    const current = snapshot.val() || {};
+                    const extras = Object.keys(current).filter(key => nodes.indexOf(key) === -1);
+                    return Promise.all(extras.map(key => database.ref(key).remove().catch(() => null)));
+                })
+                .catch(() => null);
+
+            cleanupExtraNodes
+                .then(() => Promise.all(nodes.map(node =>
+                    database.ref(node).set(backupData.database[node])
+                )))
+                .then(() => {
+                    // استعادة كل الإعدادات المحلية كما كانت
+                    restoreLocalStorage(backupData.localStorage);
+
+                    alert('✅ تمت استعادة كل البيانات بنجاح!\n' + backupSummaryText(backupData) + '\nسيتم تحديث الصفحة الآن.');
+                    setTimeout(() => window.location.reload(), 1500);
+                })
+                .catch(error => {
+                    console.error('خطأ أثناء الاستعادة الشاملة:', error);
+                    alert('حدث خطأ أثناء الاستعادة: ' + error.message);
+                });
+        } catch (error) {
+            console.error('خطأ في الاستعادة الشاملة:', error);
+            alert('حدث خطأ أثناء الاستعادة: ' + error.message);
+        }
+    }
+
+    // استعادة مفاتيح التخزين المحلي المحفوظة داخل النسخة
+    function restoreLocalStorage(savedLocalStorage) {
+        try {
+            if (!savedLocalStorage || typeof savedLocalStorage !== 'object') return;
+
+            // الاحتفاظ بالنسخ المخزّنة داخل المتصفح حتى لا تُفقد أثناء الاستعادة
+            const keptAutoBackup = localStorage.getItem('autoBackup');
+            const keptLastBackup = localStorage.getItem('lastBackup');
+
+            localStorage.clear();
+            Object.keys(savedLocalStorage).forEach(key => {
+                const value = savedLocalStorage[key];
+                if (typeof value === 'string') localStorage.setItem(key, value);
+            });
+
+            if (keptAutoBackup) localStorage.setItem('autoBackup', keptAutoBackup);
+            if (keptLastBackup) localStorage.setItem('lastBackup', keptLastBackup);
+        } catch (error) {
+            console.error('خطأ في استعادة الإعدادات المحلية:', error);
+        }
+    }
+
+    // استعادة آخر نسخة تلقائية محفوظة داخل المتصفح
+    function restoreAutoBackup() {
+        try {
+            const saved = safeParse(localStorage.getItem('autoBackup'));
+            if (!saved) {
+                alert('لا توجد نسخة تلقائية محفوظة داخل هذا المتصفح');
+                return;
+            }
+
+            if (!confirm('سيتم استبدال البيانات الحالية بآخر نسخة تلقائية:\n' + backupSummaryText(saved) + '\nهل تريد المتابعة؟')) {
+                return;
+            }
+
+            applyBackup(saved);
+        } catch (error) {
+            console.error('خطأ في استعادة النسخة التلقائية:', error);
+            alert('حدث خطأ أثناء استعادة النسخة التلقائية');
+        }
+    }
+
+    // عرض بيانات آخر نسخة تلقائية
+    function updateAutoBackupInfo() {
+        try {
+            const info = document.getElementById('auto-backup-info');
+            if (!info) return;
+
+            const saved = safeParse(localStorage.getItem('autoBackup'));
+            if (!saved) {
+                info.textContent = 'لا توجد نسخة تلقائية محفوظة داخل هذا المتصفح بعد.';
+                return;
+            }
+
+            const date = new Date(saved.timestamp || Date.now());
+            info.innerHTML = `<i class="fas fa-clock"></i> ${escapeHtml(date.toLocaleString('ar-EG'))} — ${escapeHtml(backupSummaryText(saved))}`;
+        } catch (error) {
+            console.error('خطأ في عرض معلومات النسخة التلقائية:', error);
+        }
+    }
+
+    // استعادة بيانات النسخة الاحتياطية القديمة (توافق مع الملفات السابقة)
+    function restoreLegacyBackupData(backupData) {
         try {
             console.log('بدء استعادة النسخة الاحتياطية...');
             
@@ -7119,11 +8481,13 @@
                     minute: '2-digit'
                 });
                 
+                const summary = localStorage.getItem('lastBackupSummary') || '';
                 elements.lastBackupInfo.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                         <i class="fas fa-clock"></i>
-                        <span>${formattedDate}</span>
+                        <span>${escapeHtml(formattedDate)}</span>
                     </div>
+                    ${summary ? `<div style="margin-top: 6px;">${escapeHtml(summary)}</div>` : ''}
                 `;
             }
         } catch (error) {
