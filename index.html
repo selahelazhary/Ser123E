@@ -1290,6 +1290,112 @@
             box-shadow: 0 6px 20px rgba(247, 37, 133, 0.3);
         }
 
+        .btn-admin-success {
+            background: var(--gradient-success);
+        }
+
+        .btn-admin-success:hover {
+            background: var(--success);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(76, 201, 240, 0.3);
+        }
+
+        /* مشاركة رابط القسم */
+        .share-link-box {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background-color: var(--light);
+            border: 1px solid var(--border-color, rgba(0,0,0,0.08));
+            border-radius: var(--radius);
+            padding: 8px;
+        }
+
+        .share-link-box input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            direction: ltr;
+            text-align: left;
+            padding: 6px 8px;
+            outline: none;
+            min-width: 0;
+        }
+
+        .share-id {
+            direction: ltr;
+            display: inline-block;
+            font-family: monospace;
+            background-color: var(--light);
+            border-radius: var(--radius-sm, 8px);
+            padding: 4px 10px;
+            font-size: 0.85rem;
+            color: var(--text-secondary, var(--text-primary));
+        }
+
+        .share-targets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .share-targets .btn-admin {
+            flex: 1 1 140px;
+            justify-content: center;
+        }
+
+        .share-copied {
+            margin-top: 12px;
+            color: var(--success);
+            font-weight: 600;
+            display: none;
+        }
+
+        .share-copied.show {
+            display: block;
+            animation: fadeIn 0.25s ease;
+        }
+
+        /* كود QR */
+        .share-qr {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--border-color, rgba(0,0,0,0.12));
+            text-align: center;
+        }
+
+        .share-qr-frame {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff;
+            border-radius: var(--radius);
+            padding: 14px;
+            box-shadow: var(--shadow);
+            min-width: 228px;
+            min-height: 228px;
+        }
+
+        .share-qr-frame img {
+            width: 200px;
+            height: 200px;
+            display: block;
+        }
+
+        .share-qr-status {
+            color: var(--text-secondary, var(--text-primary));
+            font-size: 0.9rem;
+        }
+
+        .share-qr-hint {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--text-secondary, var(--text-primary));
+        }
+
         .questions-list {
             margin-top: 20px;
         }
@@ -5882,6 +5988,9 @@
                     </div>
                     <p>${escapeHtml(section.description || '')}</p>
                     <div class="question-actions">
+                        <button class="btn-admin btn-admin-success btn-sm" onclick="shareSection('${escapeHtml(section.id)}')">
+                            <i class="fas fa-share-alt"></i> مشاركة الرابط
+                        </button>
                         <button class="btn-admin btn-admin-warning btn-sm" onclick="editSection('${escapeHtml(section.id)}')">
                             <i class="fas fa-edit"></i> تعديل
                         </button>
@@ -6905,6 +7014,266 @@
     }
     
     // تعديل قسم
+    // الرابط الأساسي لموقع الطلاب (يُستخدم في مشاركة روابط الأقسام)
+    const SITE_BASE_URL = 'https://selahalazhary.github.io/3E/';
+
+    // بناء رابط مشاركة القسم عبر الأيدي
+    function buildSectionShareLink(sectionId) {
+        return SITE_BASE_URL + '?section=' + encodeURIComponent(sectionId);
+    }
+
+    // بناء رابط صورة كود QR لأي رابط
+    function buildQrImageUrl(targetUrl, size) {
+        const px = size || 400;
+        return 'https://api.qrserver.com/v1/create-qr-code/?size=' + px + 'x' + px +
+            '&margin=10&ecc=M&data=' + encodeURIComponent(targetUrl);
+    }
+
+    // مشاركة رابط القسم
+    function shareSection(sectionId) {
+        try {
+            const section = sections.find(s => s.id === sectionId);
+            if (!section) {
+                alert('لم يتم العثور على القسم');
+                return;
+            }
+
+            const shareUrl = buildSectionShareLink(sectionId);
+            const shareText = `📚 قسم ${section.name} - سلاح الأزهري\n${shareUrl}`;
+            const qrImageUrl = buildQrImageUrl(shareUrl, 400);
+
+            const shareModal = document.createElement('div');
+            shareModal.className = 'edit-modal';
+            shareModal.id = 'share-section-modal';
+            shareModal.innerHTML = `
+                <div class="modal-box">
+                    <h3><i class="fas fa-share-alt"></i> مشاركة رابط القسم</h3>
+
+                    <div class="form-group">
+                        <label>القسم:</label>
+                        <p style="margin:0;font-weight:600;">
+                            <i class="${escapeHtml(section.icon || 'fas fa-layer-group')}"></i>
+                            ${escapeHtml(section.name)}
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>أيدي القسم:</label>
+                        <span class="share-id">${escapeHtml(sectionId)}</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="share-section-link">رابط المشاركة:</label>
+                        <div class="share-link-box">
+                            <input type="text" id="share-section-link" value="${escapeHtml(shareUrl)}" readonly>
+                            <button class="btn-admin btn-sm" id="copy-share-link-btn">
+                                <i class="fas fa-copy"></i> نسخ
+                            </button>
+                        </div>
+                        <p class="share-copied" id="share-copied-msg">
+                            <i class="fas fa-check-circle"></i> تم نسخ الرابط بنجاح
+                        </p>
+                    </div>
+
+                    <div class="share-targets">
+                        <button class="btn-admin btn-admin-success" id="share-whatsapp-btn">
+                            <i class="fab fa-whatsapp"></i> واتساب
+                        </button>
+                        <button class="btn-admin" id="share-telegram-btn">
+                            <i class="fab fa-telegram"></i> تليجرام
+                        </button>
+                        <button class="btn-admin btn-admin-warning" id="share-open-btn">
+                            <i class="fas fa-external-link-alt"></i> فتح الرابط
+                        </button>
+                    </div>
+
+                    <div class="share-qr">
+                        <label style="display:block;margin-bottom:12px;font-weight:600;">
+                            <i class="fas fa-qrcode"></i> كود QR للقسم
+                        </label>
+                        <div class="share-qr-frame">
+                            <span class="share-qr-status" id="share-qr-status">
+                                <i class="fas fa-spinner fa-spin"></i> جاري إنشاء الكود...
+                            </span>
+                            <img id="share-qr-img" src="${escapeHtml(qrImageUrl)}" alt="كود QR للقسم" style="display:none;">
+                        </div>
+                        <p class="share-qr-hint">امسح الكود بكاميرا الموبايل للدخول على القسم مباشرة</p>
+                        <div class="share-targets">
+                            <button class="btn-admin btn-admin-success" id="download-qr-btn">
+                                <i class="fas fa-download"></i> تحميل الكود
+                            </button>
+                            <button class="btn-admin" id="print-qr-btn">
+                                <i class="fas fa-print"></i> طباعة الكود
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="modal-buttons">
+                        <button class="btn-admin" id="share-native-btn" style="display:none;">
+                            <i class="fas fa-share-nodes"></i> مشاركة عبر الجهاز
+                        </button>
+                        <button class="btn btn-secondary" id="close-share-modal-btn">
+                            <i class="fas fa-times"></i> إغلاق
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(shareModal);
+            shareModal.style.display = 'flex';
+            if (elements.overlay) elements.overlay.classList.add('active');
+
+            const linkInput = shareModal.querySelector('#share-section-link');
+            const copiedMsg = shareModal.querySelector('#share-copied-msg');
+            const copyBtn = shareModal.querySelector('#copy-share-link-btn');
+            const nativeBtn = shareModal.querySelector('#share-native-btn');
+
+            function closeShareModal() {
+                if (shareModal.parentNode) document.body.removeChild(shareModal);
+                if (elements.overlay) elements.overlay.classList.remove('active');
+            }
+
+            function showCopied() {
+                copiedMsg.classList.add('show');
+                setTimeout(() => copiedMsg.classList.remove('show'), 2500);
+            }
+
+            function copyShareLink() {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(shareUrl)
+                        .then(showCopied)
+                        .catch(fallbackCopy);
+                } else {
+                    fallbackCopy();
+                }
+            }
+
+            function fallbackCopy() {
+                try {
+                    linkInput.removeAttribute('readonly');
+                    linkInput.select();
+                    linkInput.setSelectionRange(0, linkInput.value.length);
+                    document.execCommand('copy');
+                    linkInput.setAttribute('readonly', 'readonly');
+                    showCopied();
+                } catch (err) {
+                    alert('تعذّر النسخ تلقائيًا، انسخ الرابط يدويًا:\n' + shareUrl);
+                }
+            }
+
+            copyBtn.addEventListener('click', copyShareLink);
+            linkInput.addEventListener('click', function() {
+                this.select();
+            });
+
+            shareModal.querySelector('#share-whatsapp-btn').addEventListener('click', function() {
+                window.open('https://wa.me/?text=' + encodeURIComponent(shareText), '_blank');
+            });
+
+            shareModal.querySelector('#share-telegram-btn').addEventListener('click', function() {
+                window.open('https://t.me/share/url?url=' + encodeURIComponent(shareUrl) +
+                    '&text=' + encodeURIComponent('📚 قسم ' + section.name + ' - سلاح الأزهري'), '_blank');
+            });
+
+            shareModal.querySelector('#share-open-btn').addEventListener('click', function() {
+                window.open(shareUrl, '_blank');
+            });
+
+            if (navigator.share) {
+                nativeBtn.style.display = 'inline-flex';
+                nativeBtn.addEventListener('click', function() {
+                    navigator.share({
+                        title: 'قسم ' + section.name + ' - سلاح الأزهري',
+                        text: 'ادخل على قسم ' + section.name + ' من هنا',
+                        url: shareUrl
+                    }).catch(() => {});
+                });
+            }
+
+            // كود QR
+            const qrImg = shareModal.querySelector('#share-qr-img');
+            const qrStatus = shareModal.querySelector('#share-qr-status');
+            const qrFileName = 'qr-' + (section.name || 'section').replace(/[\\/:*?"<>|]/g, '') + '.png';
+
+            qrImg.addEventListener('load', function() {
+                qrStatus.style.display = 'none';
+                qrImg.style.display = 'block';
+            });
+
+            qrImg.addEventListener('error', function() {
+                qrStatus.innerHTML = '<i class="fas fa-triangle-exclamation"></i> تعذّر إنشاء الكود، تأكد من الاتصال بالإنترنت';
+            });
+
+            shareModal.querySelector('#download-qr-btn').addEventListener('click', function() {
+                fetch(buildQrImageUrl(shareUrl, 800))
+                    .then(res => {
+                        if (!res.ok) throw new Error('fetch failed');
+                        return res.blob();
+                    })
+                    .then(blob => {
+                        const blobUrl = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = blobUrl;
+                        a.download = qrFileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+                    })
+                    .catch(() => {
+                        window.open(buildQrImageUrl(shareUrl, 800), '_blank');
+                    });
+            });
+
+            shareModal.querySelector('#print-qr-btn').addEventListener('click', function() {
+                const printWindow = window.open('', '_blank');
+                if (!printWindow) {
+                    alert('من فضلك اسمح بالنوافذ المنبثقة لطباعة الكود');
+                    return;
+                }
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html lang="ar" dir="rtl">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>كود QR - ${escapeHtml(section.name)}</title>
+                        <style>
+                            body { font-family: 'Tajawal', Arial, sans-serif; text-align: center; padding: 40px; }
+                            h1 { font-size: 26px; margin-bottom: 6px; }
+                            h2 { font-size: 18px; font-weight: normal; color: #555; margin-top: 0; }
+                            img { width: 360px; height: 360px; margin: 24px auto; display: block; }
+                            .link { direction: ltr; font-size: 13px; color: #666; word-break: break-all; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>${escapeHtml(section.name)}</h1>
+                        <h2>سلاح الأزهري - امسح الكود للدخول على القسم</h2>
+                        <img src="${escapeHtml(buildQrImageUrl(shareUrl, 600))}" alt="QR">
+                        <p class="link">${escapeHtml(shareUrl)}</p>
+                        <script>
+                            window.onload = function() {
+                                var img = document.querySelector('img');
+                                if (img.complete) { window.print(); }
+                                else { img.onload = function() { window.print(); }; }
+                            };
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+            });
+
+            shareModal.querySelector('#close-share-modal-btn').addEventListener('click', closeShareModal);
+
+            shareModal.addEventListener('click', function(e) {
+                if (e.target === shareModal) closeShareModal();
+            });
+        } catch (error) {
+            console.error('خطأ في مشاركة القسم:', error);
+            alert('حدث خطأ أثناء إنشاء رابط المشاركة');
+        }
+    }
+
     function editSection(sectionId) {
         try {
             const section = sections.find(s => s.id === sectionId);
@@ -6912,7 +7281,7 @@
                 alert('لم يتم العثور على القسم');
                 return;
             }
-            
+
             const editModal = document.createElement('div');
             editModal.className = 'edit-modal';
             editModal.id = 'edit-section-modal';
