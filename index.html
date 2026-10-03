@@ -3384,7 +3384,11 @@
             </div>
             <div class="admin-nav-item" data-tab="backup">
                 <i class="fas fa-database"></i>
-                <span>النسخ الاحتياطي</span>
+                                <span>النسخ الاحتياطي</span>
+            </div>
+            <div class="admin-nav-item" data-tab="trash">
+                <i class="fas fa-trash-restore"></i>
+                <span>سلة المحذوفات</span>
             </div>
         </div>
         
@@ -3732,6 +3736,10 @@
                                 <label><input type="checkbox" name="section-grades" value="prep3"> الصف الثالث الإعدادي</label>
                             </div>
                         </div>
+                                                <div class="form-group">
+                            <label for="new-section-order">ترتيب القسم (رقم):</label>
+                            <input type="number" id="new-section-order" class="form-control" min="1" placeholder="اتركه فارغًا ليُضاف في النهاية">
+                        </div>
                         <button class="btn-admin" id="add-section-btn">
                             <i class="fas fa-plus"></i> إضافة قسم
                         </button>
@@ -3983,6 +3991,27 @@
                 </div>
             </div>
             
+                        <!-- تبويب سلة المحذوفات -->
+            <div id="trash-tab" class="admin-tab-content">
+                <div class="admin-card">
+                    <h3><i class="fas fa-trash-restore"></i> سلة المحذوفات</h3>
+                    <p style="margin-bottom:12px;opacity:.8">أي عنصر تحذفه يُنقل هنا أولًا، ويمكنك استرجاعه بنفس بياناته.</p>
+                    <div class="admin-form">
+                        <div class="form-group">
+                            <select id="trash-filter" class="form-control">
+                                <option value="">كل الأنواع</option>
+                                <option value="questions">الأسئلة</option>
+                                <option value="sections">الأقسام</option>
+                                <option value="subjects">المواد</option>
+                                <option value="lessons">الدروس</option>
+                                <option value="sublessons">الأقسام الفرعية</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="trash-list"></div>
+                </div>
+            </div>
+
             <!-- تبويب النسخ الاحتياطي -->
             <div id="backup-tab" class="admin-tab-content">
                 <div class="admin-card">
@@ -4531,7 +4560,9 @@
     // تحميل البيانات الأولية
     function loadInitialData() {
         try {
+                        loadTrash();
             loadSections();
+
             loadSubjects();
             loadLessons();
             loadSublessons();
@@ -4551,10 +4582,11 @@
                 sections = [];
                 snapshot.forEach((childSnapshot) => {
                     const section = childSnapshot.val();
-                    section.id = childSnapshot.key;
+                                        section.id = childSnapshot.key;
                     sections.push(section);
                 });
-                
+                sections.sort((a, b) => (parseInt(a.order, 10) || 9999) - (parseInt(b.order, 10) || 9999));
+
                 // تحديث القوائم المنسدلة في لوحة الإدارة
                 updateSectionDropdowns();
                 // تحديث قوائم الإدارة الحية
@@ -5984,7 +6016,8 @@
                     <h4><i class="${escapeHtml(section.icon || 'fas fa-layer-group')}"></i> ${escapeHtml(section.name)}</h4>
                     <div class="question-meta">
                         <span><i class="fas fa-graduation-cap"></i> ${Array.isArray(section.grades) && section.grades.length ? escapeHtml(section.grades.map(g => getYearText(g)).join('، ')) : 'لم يتم تحديد صفوف'}</span>
-                        <span><i class="fas fa-book"></i> ${subjects.filter(s => s.sectionId === section.id).length} مادة</span>
+                                                <span><i class="fas fa-book"></i> ${subjects.filter(s => s.sectionId === section.id).length} مادة</span>
+                        <span><i class="fas fa-sort-numeric-up"></i> الترتيب: <input type="number" min="1" value="${section.order || ''}" onchange="setSectionOrder('${escapeHtml(section.id)}', this.value)" style="width:64px;padding:2px 6px;border:1px solid #cbd5e1;border-radius:8px"></span>
                     </div>
                     <p>${escapeHtml(section.description || '')}</p>
                     <div class="question-actions">
@@ -6593,11 +6626,94 @@
         }
     }
     
+        // ===== سلة المحذوفات: الحذف ينقل العنصر إلى trash بدلًا من مسحه نهائيًا =====
+    const TRASH_LABELS = { questions: 'سؤال', sections: 'قسم', subjects: 'مادة', lessons: 'درس', sublessons: 'قسم فرعي' };
+    let trashItems = [];
+
+    function moveToTrash(node, id) {
+        return database.ref(node + '/' + id).once('value').then(snap => {
+            if (!snap.exists()) return null;
+            return database.ref('trash/' + node + '/' + id)
+                .set({ data: snap.val(), deletedAt: firebase.database.ServerValue.TIMESTAMP })
+                .then(() => database.ref(node + '/' + id).remove());
+        });
+    }
+
+    function setSectionOrder(id, val) {
+        const n = parseInt(val, 10);
+        database.ref('sections/' + id).update({ order: n > 0 ? n : null })
+            .then(() => createAutoBackup())
+            .catch(error => alert('حدث خطأ أثناء تحديث الترتيب: ' + error.message));
+    }
+
+    function loadTrash() {
+        database.ref('trash').on('value', (snapshot) => {
+            trashItems = [];
+            snapshot.forEach(typeSnap => {
+                typeSnap.forEach(c => {
+                    const v = c.val() || {};
+                    trashItems.push({ node: typeSnap.key, id: c.key, data: v.data || {}, deletedAt: v.deletedAt || 0 });
+                });
+            });
+            trashItems.sort((a, b) => b.deletedAt - a.deletedAt);
+            renderTrashList();
+        }, (error) => console.error('خطأ في تحميل سلة المحذوفات:', error));
+    }
+
+    function renderTrashList() {
+        const list = document.getElementById('trash-list');
+        if (!list) return;
+        const f = document.getElementById('trash-filter').value;
+        const items = trashItems.filter(t => !f || t.node === f);
+        if (!items.length) {
+            list.innerHTML = '<div class="no-questions"><i class="fas fa-info-circle"></i><h3>السلة فارغة</h3></div>';
+            return;
+        }
+        list.innerHTML = items.map(t => {
+            const title = t.data.name || t.data.text || t.data.question || '(بدون عنوان)';
+            const when = t.deletedAt ? new Date(t.deletedAt).toLocaleString('ar-EG') : '';
+            return `
+                <div class="question-item">
+                    <h4>${escapeHtml(String(title).slice(0, 160))}</h4>
+                    <div class="question-meta">
+                        <span><i class="fas fa-tag"></i> ${TRASH_LABELS[t.node] || escapeHtml(t.node)}</span>
+                        <span><i class="fas fa-clock"></i> ${escapeHtml(when)}</span>
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn-admin btn-admin-success btn-sm" onclick="restoreTrash('${escapeHtml(t.node)}','${escapeHtml(t.id)}')">
+                            <i class="fas fa-undo"></i> استرجاع
+                        </button>
+                        <button class="btn-admin btn-admin-danger btn-sm" onclick="purgeTrash('${escapeHtml(t.node)}','${escapeHtml(t.id)}')">
+                            <i class="fas fa-times"></i> حذف نهائي
+                        </button>
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    function restoreTrash(node, id) {
+        const t = trashItems.find(x => x.node === node && x.id === id);
+        if (!t) return;
+        database.ref(node + '/' + id).set(t.data)
+            .then(() => database.ref('trash/' + node + '/' + id).remove())
+            .then(() => { alert('تم الاسترجاع بنجاح'); createAutoBackup(); })
+            .catch(error => alert('حدث خطأ أثناء الاسترجاع: ' + error.message));
+    }
+
+    function purgeTrash(node, id) {
+        if (!confirm('سيتم حذف هذا العنصر نهائيًا ولا يمكن استرجاعه. هل أنت متأكد؟')) return;
+        database.ref('trash/' + node + '/' + id).remove()
+            .catch(error => alert('حدث خطأ أثناء الحذف النهائي: ' + error.message));
+    }
+
+    document.addEventListener('change', (e) => { if (e.target && e.target.id === 'trash-filter') renderTrashList(); });
+
+
     // حذف قسم
     function deleteSection(sectionId) {
         try {
             if (confirm('هل أنت متأكد من حذف هذا القسم؟ سيتم حذف جميع المواد والأسئلة المرتبطة به.')) {
-                database.ref('sections/' + sectionId).remove()
+                moveToTrash('sections', sectionId)
                     .then(() => {
                         alert('تم حذف القسم بنجاح');
                         loadSectionsForAdmin();
@@ -6617,7 +6733,7 @@
     function deleteSubject(subjectId) {
         try {
             if (confirm('هل أنت متأكد من حذف هذه المادة؟ سيتم حذف جميع الأسئلة المرتبطة بها.')) {
-                database.ref('subjects/' + subjectId).remove()
+                moveToTrash('subjects', subjectId)
                     .then(() => {
                         alert('تم حذف المادة بنجاح');
                         loadSubjectsForAdmin();
@@ -6637,7 +6753,7 @@
     function deleteLesson(lessonId) {
         try {
             if (confirm('هل أنت متأكد من حذف هذا الدرس؟ سيتم حذف جميع الأسئلة المرتبطة به.')) {
-                database.ref('lessons/' + lessonId).remove()
+                moveToTrash('lessons', lessonId)
                     .then(() => {
                         alert('تم حذف الدرس بنجاح');
                         loadLessonsForAdmin();
@@ -6657,7 +6773,7 @@
     function deleteSublesson(sublessonId) {
         try {
             if (confirm('هل أنت متأكد من حذف هذا القسم الفرعي؟ سيتم حذف جميع الأسئلة المرتبطة به.')) {
-                database.ref('sublessons/' + sublessonId).remove()
+                moveToTrash('sublessons', sublessonId)
                     .then(() => {
                         alert('تم حذف القسم الفرعي بنجاح');
                         loadSublessonsForAdmin();
@@ -6677,7 +6793,7 @@
     function deleteQuestion(questionId) {
         try {
             if (confirm('هل أنت متأكد من حذف هذا السؤال؟')) {
-                database.ref('questions/' + questionId).remove()
+                moveToTrash('questions', questionId)
                     .then(() => {
                         alert('تم حذف السؤال بنجاح');
                         loadAllQuestions();
@@ -7313,6 +7429,11 @@
                         </select>
                     </div>
                     
+                                        <div class="form-group">
+                        <label for="edit-section-order">ترتيب القسم (رقم):</label>
+                        <input type="number" id="edit-section-order" class="form-control" min="1" value="${section.order || ''}">
+                    </div>
+
                     <div class="form-group">
                         <label>الصفوف المرتبطة:</label>
                         <div class="grades-checkboxes">
@@ -7360,10 +7481,11 @@
                     name: sectionName,
                     description: sectionDescription,
                     icon: sectionIcon,
-                    grades: selectedGrades,
+                                        grades: selectedGrades,
+                    order: parseInt(editModal.querySelector('#edit-section-order').value, 10) || null,
                     updatedAt: new Date().toISOString()
                 };
-                
+
                 database.ref('sections/' + sectionId).update(sectionData)
                     .then(() => {
                         alert('تم تحديث القسم بنجاح');
@@ -7953,17 +8075,19 @@
                 name: sectionName,
                 description: sectionDescription,
                 icon: sectionIcon,
-                grades: selectedGrades,
+                                grades: selectedGrades,
+                order: parseInt(document.getElementById('new-section-order').value, 10) || (sections.reduce((m, x) => Math.max(m, parseInt(x.order, 10) || 0), 0) + 1),
                 createdAt: new Date().toISOString()
             };
-            
+
             const sectionsRef = database.ref('sections');
             sectionsRef.push(sectionData)
                 .then(() => {
                     alert('تمت إضافة القسم بنجاح');
                     
                     // مسح الحقول
-                    elements.newSectionName.value = '';
+                                        elements.newSectionName.value = '';
+                    document.getElementById('new-section-order').value = '';
                     elements.newSectionDescription.value = '';
                     document.querySelectorAll('input[name="section-grades"]').forEach(cb => cb.checked = false);
                     
@@ -8202,6 +8326,8 @@
                     loadSubjectsForAdmin();
                 } else if (tabId === 'user-analytics') {
                     updateUserAnalytics();
+                                } else if (tabId === 'trash') {
+                    renderTrashList();
                 } else if (tabId === 'backup') {
                     updateLastBackupInfo();
                     updateAutoBackupInfo();
