@@ -14,12 +14,12 @@
     <style>
         /* تصميم حديث محسن */
         :root {
-            --primary: #4361ee;
-            --primary-light: #4895ef;
-            --primary-dark: #3a0ca3;
-            --secondary: #7209b7;
+            --primary: #277d45;
+            --primary-light: #4fa36b;
+            --primary-dark: #1a5a30;
+            --secondary: #1f6a39;
             --success: #4cc9f0;
-            --success-light: #4895ef;
+            --success-light: #4fa36b;
             --danger: #f72585;
             --danger-light: #b5179e;
             --warning: #f8961e;
@@ -42,19 +42,19 @@
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             --safe-area-top: env(safe-area-inset-top);
             --safe-area-bottom: env(safe-area-inset-bottom);
-            --gradient-primary: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
-            --gradient-secondary: linear-gradient(135deg, #7209b7 0%, #560bad 100%);
-            --gradient-success: linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%);
+            --gradient-primary: linear-gradient(135deg, #277d45 0%, #1a5a30 100%);
+            --gradient-secondary: linear-gradient(135deg, #1f6a39 0%, #174f2a 100%);
+            --gradient-success: linear-gradient(135deg, #4cc9f0 0%, #4fa36b 100%);
             --gradient-danger: linear-gradient(135deg, #f72585 0%, #b5179e 100%);
             --gradient-warning: linear-gradient(135deg, #f8961e 0%, #f9c74f 100%);
         }
 
         /* Dark Mode Variables */
         [data-theme="dark"] {
-            --primary: #6366f1;
-            --primary-light: #818cf8;
-            --primary-dark: #4f46e5;
-            --secondary: #7c3aed;
+            --primary: #2f9b58;
+            --primary-light: #4fbf7a;
+            --primary-dark: #1f7a43;
+            --secondary: #277d45;
             --success: #10b981;
             --success-light: #34d399;
             --danger: #ef4444;
@@ -74,8 +74,8 @@
             --card-bg-dark: #0f172a;
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.4);
-            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-            --gradient-secondary: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            --gradient-primary: linear-gradient(135deg, #2f9b58 0%, #1f7a43 100%);
+            --gradient-secondary: linear-gradient(135deg, #277d45 0%, #6d28d9 100%);
             --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
             --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
@@ -128,7 +128,7 @@
             border-radius: 24px;
             box-shadow: 
                 0 8px 32px rgba(0, 0, 0, 0.1),
-                0 4px 16px rgba(67, 97, 238, 0.1),
+                0 4px 16px rgba(39, 125, 69, 0.1),
                 inset 0 0 0 1px rgba(255, 255, 255, 0.3);
             max-width: 1200px;
             width: calc(100% - 40px);
@@ -141,7 +141,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 
                 0 8px 32px rgba(0, 0, 0, 0.3),
-                0 4px 16px rgba(99, 102, 241, 0.2),
+                0 4px 16px rgba(47, 155, 88, 0.2),
                 inset 0 0 0 1px rgba(255, 255, 255, 0.1);
         }
 
@@ -181,11 +181,11 @@
 
         .logo-container:hover {
             transform: translateY(-2px);
-            background: rgba(67, 97, 238, 0.1);
+            background: rgba(39, 125, 69, 0.1);
         }
 
         [data-theme="dark"] .logo-container:hover {
-            background: rgba(99, 102, 241, 0.2);
+            background: rgba(47, 155, 88, 0.2);
         }
 
         .logo {
@@ -212,11 +212,11 @@
 
         .logo-container:hover .logo-img {
             transform: scale(1.05) rotate(2deg);
-            filter: drop-shadow(0 4px 8px rgba(67, 97, 238, 0.3));
+            filter: drop-shadow(0 4px 8px rgba(39, 125, 69, 0.3));
         }
 
         [data-theme="dark"] .logo-container:hover .logo-img {
-            filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.4));
+            filter: drop-shadow(0 4px 8px rgba(47, 155, 88, 0.4));
         }
 
         /* زر الرجوع في التولبار - تصميم مشابه لزر Dark Mode */
@@ -224,7 +224,7 @@
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            background: rgba(67, 97, 238, 0.1);
+            background: rgba(39, 125, 69, 0.1);
             border: none;
             color: var(--primary);
             cursor: pointer;
@@ -240,18 +240,18 @@
         }
 
         [data-theme="dark"] .header-back-btn {
-            background: rgba(99, 102, 241, 0.2);
+            background: rgba(47, 155, 88, 0.2);
         }
 
         .header-back-btn:hover {
             transform: scale(1.1) rotate(-15deg);
-            background: rgba(67, 97, 238, 0.2);
-            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+            background: rgba(39, 125, 69, 0.2);
+            box-shadow: 0 4px 15px rgba(39, 125, 69, 0.3);
         }
 
         [data-theme="dark"] .header-back-btn:hover {
-            background: rgba(99, 102, 241, 0.3);
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            background: rgba(47, 155, 88, 0.3);
+            box-shadow: 0 4px 15px rgba(47, 155, 88, 0.4);
         }
 
         .header-back-btn::before {
@@ -281,7 +281,7 @@
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            background: rgba(67, 97, 238, 0.1);
+            background: rgba(39, 125, 69, 0.1);
             border: none;
             color: var(--primary);
             cursor: pointer;
@@ -297,18 +297,18 @@
         }
 
         [data-theme="dark"] .theme-toggle {
-            background: rgba(99, 102, 241, 0.2);
+            background: rgba(47, 155, 88, 0.2);
         }
 
         .theme-toggle:hover {
             transform: scale(1.1) rotate(15deg);
-            background: rgba(67, 97, 238, 0.2);
-            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+            background: rgba(39, 125, 69, 0.2);
+            box-shadow: 0 4px 15px rgba(39, 125, 69, 0.3);
         }
 
         [data-theme="dark"] .theme-toggle:hover {
-            background: rgba(99, 102, 241, 0.3);
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            background: rgba(47, 155, 88, 0.3);
+            box-shadow: 0 4px 15px rgba(47, 155, 88, 0.4);
         }
 
         .theme-toggle::before {
@@ -521,13 +521,13 @@
         .question {
             margin-bottom: 30px;
             padding: 20px;
-            background: rgba(67, 97, 238, 0.03);
+            background: rgba(39, 125, 69, 0.03);
             border-radius: var(--radius);
             border-left: 4px solid var(--primary);
         }
 
         [data-theme="dark"] .question {
-            background: rgba(99, 102, 241, 0.05);
+            background: rgba(47, 155, 88, 0.05);
         }
 
         .question h3 {
@@ -549,7 +549,7 @@
             line-height: 36px;
             margin-left: 12px;
             font-weight: 700;
-            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.3);
+            box-shadow: 0 2px 8px rgba(39, 125, 69, 0.3);
         }
 
         .options {
@@ -572,13 +572,13 @@
         }
 
         .option:hover {
-            background-color: rgba(67, 97, 238, 0.05);
+            background-color: rgba(39, 125, 69, 0.05);
             border-color: var(--primary-light);
             transform: translateX(4px);
         }
 
         [data-theme="dark"] .option:hover {
-            background-color: rgba(99, 102, 241, 0.1);
+            background-color: rgba(47, 155, 88, 0.1);
         }
 
         .option.selected {
@@ -643,13 +643,13 @@
         }
 
         .true-false-btn:hover {
-            background-color: rgba(67, 97, 238, 0.05);
+            background-color: rgba(39, 125, 69, 0.05);
             border-color: var(--primary-light);
             transform: translateY(-2px);
         }
 
         [data-theme="dark"] .true-false-btn:hover {
-            background-color: rgba(99, 102, 241, 0.1);
+            background-color: rgba(47, 155, 88, 0.1);
         }
 
         .true-false-btn.selected {
@@ -704,11 +704,11 @@
         .btn-primary:hover {
             background: var(--primary-dark);
             transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.3);
+            box-shadow: 0 6px 20px rgba(39, 125, 69, 0.3);
         }
 
         [data-theme="dark"] .btn-primary:hover {
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 6px 20px rgba(47, 155, 88, 0.4);
         }
 
         .btn-secondary {
@@ -886,7 +886,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #277d45 0%, #1a5a30 100%);
             display: none;
             flex-direction: column;
             align-items: center;
@@ -912,7 +912,7 @@
             transform: translate(-50%, -50%);
             width: 40px;
             height: 40px;
-            background: radial-gradient(circle, #4cc9f0 0%, #4361ee 100%);
+            background: radial-gradient(circle, #4cc9f0 0%, #277d45 100%);
             border-radius: 50%;
             box-shadow: 0 0 30px rgba(76, 201, 240, 0.5);
             animation: pulseCore 2s infinite;
@@ -1130,13 +1130,13 @@
         }
 
         .admin-nav-item:hover {
-            background: rgba(67, 97, 238, 0.1);
+            background: rgba(39, 125, 69, 0.1);
             color: var(--primary);
             transform: translateX(5px);
         }
 
         [data-theme="dark"] .admin-nav-item:hover {
-            background: rgba(99, 102, 241, 0.2);
+            background: rgba(47, 155, 88, 0.2);
         }
 
         .admin-nav-item.active {
@@ -1229,11 +1229,11 @@
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            box-shadow: 0 0 0 3px rgba(39, 125, 69, 0.2);
         }
 
         [data-theme="dark"] .form-control:focus {
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 0 0 3px rgba(47, 155, 88, 0.3);
         }
 
         textarea.form-control {
@@ -1262,11 +1262,11 @@
         .btn-admin:hover {
             background: var(--primary-dark);
             transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.3);
+            box-shadow: 0 6px 20px rgba(39, 125, 69, 0.3);
         }
 
         [data-theme="dark"] .btn-admin:hover {
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 6px 20px rgba(47, 155, 88, 0.4);
         }
 
         /* تحسين أزرار الإدارة */
@@ -1739,21 +1739,21 @@
             justify-content: center;
             font-size: 1.1rem;
             font-weight: 700;
-            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
+            box-shadow: 0 4px 12px rgba(39, 125, 69, 0.4);
             transition: var(--transition);
         }
 
         [data-theme="dark"] .user-avatar {
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 4px 12px rgba(47, 155, 88, 0.4);
         }
 
         .user-profile:hover .user-avatar {
             transform: scale(1.08);
-            box-shadow: 0 6px 16px rgba(67, 97, 238, 0.5);
+            box-shadow: 0 6px 16px rgba(39, 125, 69, 0.5);
         }
 
         [data-theme="dark"] .user-profile:hover .user-avatar {
-            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5);
+            box-shadow: 0 6px 16px rgba(47, 155, 88, 0.5);
         }
 
         /* Secure Badge - تصميم حديث */
@@ -1982,13 +1982,13 @@
         .btn-3d:hover {
             transform: translateY(-4px) scale(1.02);
             box-shadow: 
-                0 10px 20px rgba(67, 97, 238, 0.25),
+                0 10px 20px rgba(39, 125, 69, 0.25),
                 0 5px 10px rgba(0, 0, 0, 0.1);
         }
 
         [data-theme="dark"] .btn-3d:hover {
             box-shadow: 
-                0 10px 20px rgba(99, 102, 241, 0.3),
+                0 10px 20px rgba(47, 155, 88, 0.3),
                 0 5px 10px rgba(0, 0, 0, 0.2);
         }
 
@@ -2009,11 +2009,11 @@
 
         .logo-container:hover .logo-img {
             transform: rotateY(12deg) scale(1.06);
-            filter: drop-shadow(0 6px 12px rgba(67, 97, 238, 0.4));
+            filter: drop-shadow(0 6px 12px rgba(39, 125, 69, 0.4));
         }
 
         [data-theme="dark"] .logo-container:hover .logo-img {
-            filter: drop-shadow(0 6px 12px rgba(99, 102, 241, 0.5));
+            filter: drop-shadow(0 6px 12px rgba(47, 155, 88, 0.5));
         }
 
         /* Backup Button Styles */
@@ -2397,17 +2397,17 @@
            لوحة تحكم إدارية كاملة الشاشة (Dashboard)
            ============================================================ */
         body.admin-only {
-            --admin-bg: #eef1f8;
+            --admin-bg: #eef5f0;
             --admin-nav-bg: #ffffff;
             --admin-border: rgba(15, 23, 42, 0.08);
-            --admin-ring: rgba(67, 97, 238, 0.12);
+            --admin-ring: rgba(39, 125, 69, 0.12);
         }
 
         [data-theme="dark"] body.admin-only {
             --admin-bg: #0b1120;
             --admin-nav-bg: #111c33;
             --admin-border: rgba(148, 163, 184, 0.16);
-            --admin-ring: rgba(99, 102, 241, 0.22);
+            --admin-ring: rgba(47, 155, 88, 0.22);
         }
 
         body.admin-only .admin-panel {
@@ -2598,13 +2598,13 @@
             align-items: center;
             justify-content: center;
             font-size: 19px;
-            background: rgba(67, 97, 238, 0.09);
+            background: rgba(39, 125, 69, 0.09);
             color: var(--primary);
             transition: var(--transition);
         }
 
         [data-theme="dark"] body.admin-only .admin-nav-item i {
-            background: rgba(99, 102, 241, 0.18);
+            background: rgba(47, 155, 88, 0.18);
             color: var(--primary-light);
         }
 
@@ -2821,7 +2821,7 @@
             gap: 8px;
             padding: 8px 16px;
             border-radius: 999px;
-            background: rgba(67, 97, 238, 0.1);
+            background: rgba(39, 125, 69, 0.1);
             color: var(--primary);
             font-weight: 700;
             font-size: 14px;
@@ -2829,7 +2829,7 @@
         }
 
         [data-theme="dark"] .list-count {
-            background: rgba(99, 102, 241, 0.18);
+            background: rgba(47, 155, 88, 0.18);
             color: var(--primary-light);
         }
 
@@ -2905,7 +2905,7 @@
             transform: translateY(-2px);
             background: var(--card-bg);
             box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
-            border-color: rgba(67, 97, 238, 0.35);
+            border-color: rgba(39, 125, 69, 0.35);
         }
 
         [data-theme="dark"] body.admin-only .question-item:hover {
