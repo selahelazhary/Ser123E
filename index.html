@@ -4342,8 +4342,7 @@
     // تهيئة التطبيق
     function initApp() {
         try {
-            // تسجيل دخول المستخدم
-            trackUserVisit();
+            // لا تُسجَّل زيارات لوحة الإدارة ضمن إحصائيات الطلاب
             
             // تطبيق وضع Dark Mode إذا كان مفعلًا
             if (isDarkMode) {
@@ -5804,7 +5803,58 @@
     }
     
     // تحديث إحصائيات المستخدمين
+    // بناء إحصائيات المستخدمين من سجل النشاط في قاعدة البيانات (زيارات الطلاب واختباراتهم)
+    function buildUserStatsFromActivities(activities) {
+        const stats = normalizeUserStats(null);
+        const todayKey = new Date().toDateString();
+        const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        const sessions = new Map();
+        const quizCount = new Map();
+        activities.forEach(a => {
+            if (!a || !a.userId) return;
+            if (typeof a.page === 'string' && (a.page.indexOf('Ser123E') !== -1 || a.page.indexOf('localhost') !== -1)) return; // زيارات الإدارة والاختبارات المحلية
+            const t = new Date(a.timestamp);
+            if (isNaN(t)) return;
+            stats.userActivities.push(a);
+            stats.uniqueUsers.add(a.userId);
+            if (t.toDateString() === todayKey) stats.dailyActiveUsers.add(a.userId + '_' + todayKey);
+            if (t.getTime() >= weekAgo) stats.activeUsers.add(a.userId);
+            if (a.action === 'visit') {
+                stats.totalVisits++;
+                const cur = sessions.get(a.userId) || { userId: a.userId, count: 0, firstVisit: a.timestamp, lastVisit: a.timestamp };
+                cur.count++;
+                if (a.timestamp < cur.firstVisit) cur.firstVisit = a.timestamp;
+                if (a.timestamp > cur.lastVisit) cur.lastVisit = a.timestamp;
+                sessions.set(a.userId, cur);
+            } else if (a.action === 'quiz_complete') {
+                quizCount.set(a.userId, (quizCount.get(a.userId) || 0) + 1);
+            }
+        });
+        stats.userSessions = Array.from(sessions.values());
+        quizCount.forEach((n, id) => { if (n >= 3) stats.permanentUsers.add(id); });
+        return stats;
+    }
+
     function updateUserAnalytics() {
+        try {
+            database.ref('userActivities').orderByKey().limitToLast(5000).once('value')
+                .then(snapshot => {
+                    const list = [];
+                    snapshot.forEach(child => { list.push(child.val()); });
+                    userStats = buildUserStatsFromActivities(list);
+                    renderUserAnalytics();
+                })
+                .catch(error => {
+                    console.error('تعذر تحميل نشاط المستخدمين من قاعدة البيانات:', error);
+                    renderUserAnalytics();
+                });
+        } catch (error) {
+            console.error('خطأ في تحميل إحصائيات المستخدمين:', error);
+            renderUserAnalytics();
+        }
+    }
+
+    function renderUserAnalytics() {
         try {
             // تحديث الإحصائيات
             const totalUsers = userStats.uniqueUsers.size;
