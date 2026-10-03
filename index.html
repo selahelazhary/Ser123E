@@ -3134,6 +3134,15 @@
             color: var(--text-secondary);
             max-width: 420px;
         }
+
+        /* ---- أداة الترتيب بالأرقام ---- */
+        .ord-ctl { display: inline-flex; flex-direction: row; align-items: center; background: var(--light); border: 1px solid var(--admin-border, rgba(15,23,42,.08)); border-radius: 12px; padding: 2px; direction: ltr; margin-bottom: 10px; }
+        .ord-btn { width: 30px; height: 32px; border: none; background: transparent; color: var(--primary); border-radius: 9px; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+        .ord-btn:hover:not(:disabled) { background: rgba(39, 125, 69, 0.12); }
+        .ord-btn:disabled { opacity: 0.25; cursor: default; }
+        .ord-input { width: 40px; height: 32px; border: none; background: transparent; text-align: center; font-weight: 800; font-size: 15px; color: var(--text-primary); -moz-appearance: textfield; appearance: textfield; }
+        .ord-input::-webkit-outer-spin-button, .ord-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .ord-input:focus { outline: none; background: var(--card-bg); border-radius: 8px; box-shadow: 0 0 0 2px var(--primary); }
     </style>
 </head>
 <body class="admin-only">
@@ -3783,6 +3792,10 @@
                                 <!-- سيتم ملؤها ديناميكيًا -->
                             </select>
                         </div>
+                                                <div class="form-group">
+                            <label for="new-subject-order">ترتيب المادة (رقم):</label>
+                            <input type="number" id="new-subject-order" class="form-control" min="1" placeholder="اتركه فارغًا ليُضاف في النهاية">
+                        </div>
                         <div class="form-group">
                             <label for="new-subject-icon">أيقونة المادة:</label>
                             <select id="new-subject-icon" class="form-control">
@@ -3862,7 +3875,7 @@
                         </div>
                         <div class="form-group">
                             <label for="new-lesson-order">ترتيب الدرس:</label>
-                            <input type="number" id="new-lesson-order" class="form-control" placeholder="ترتيب العرض" min="1" value="1">
+                            <input type="number" id="new-lesson-order" class="form-control" placeholder="اتركه فارغًا ليُضاف في النهاية" min="1">
                         </div>
                         <button class="btn-admin" id="add-lesson-btn">
                             <i class="fas fa-plus"></i> إضافة درس
@@ -3922,7 +3935,7 @@
                         </div>
                         <div class="form-group">
                             <label for="new-sublesson-order">ترتيب القسم الفرعي:</label>
-                            <input type="number" id="new-sublesson-order" class="form-control" placeholder="ترتيب العرض" min="1" value="1">
+                            <input type="number" id="new-sublesson-order" class="form-control" placeholder="اتركه فارغًا ليُضاف في النهاية" min="1">
                         </div>
                         <button class="btn-admin" id="add-sublesson-btn">
                             <i class="fas fa-plus"></i> إضافة قسم فرعي
@@ -4611,6 +4624,7 @@
                     subject.id = childSnapshot.key;
                     subjects.push(subject);
                 });
+                subjects.sort((a, b) => _ord(a) - _ord(b));
                 
                 // تحديث القوائم المنسدلة في لوحة الإدارة
                 updateSubjectDropdowns();
@@ -4637,6 +4651,7 @@
                     lesson.id = childSnapshot.key;
                     lessons.push(lesson);
                 });
+                lessons.sort((a, b) => _ord(a) - _ord(b));
                 
                 // تحديث القوائم المنسدلة في لوحة الإدارة
                 updateLessonDropdowns();
@@ -4665,6 +4680,7 @@
                     sublesson.id = childSnapshot.key;
                     sublessons.push(sublesson);
                 });
+                sublessons.sort((a, b) => _ord(a) - _ord(b));
                 
                 // تحديث القوائم المنسدلة في لوحة الإدارة
                 updateSublessonDropdowns();
@@ -6046,14 +6062,75 @@
         `;
     }
 
+    
+    // ===== الترتيب بالأرقام: أداة موحدة للأقسام والمواد والدروس والأقسام الفرعية =====
+    function _ord(x) { return parseInt(x.order, 10) || 9999; }
+    function _rank(arr) { const m = {}; arr.forEach((x, i) => { m[x.id] = i; }); return m; }
+    function sortedSections() { return sections.slice().sort((a, b) => _ord(a) - _ord(b)); }
+    function sortedSubjects() { const r = _rank(sortedSections()); return subjects.slice().sort((a, b) => ((r[a.sectionId] ?? 9999) - (r[b.sectionId] ?? 9999)) || (_ord(a) - _ord(b))); }
+    function sortedLessons() { const r = _rank(sortedSubjects()); return lessons.slice().sort((a, b) => ((r[a.subjectId] ?? 9999) - (r[b.subjectId] ?? 9999)) || (_ord(a) - _ord(b))); }
+    function sortedSublessons() { const r = _rank(sortedLessons()); return sublessons.slice().sort((a, b) => ((r[a.lessonId] ?? 9999) - (r[b.lessonId] ?? 9999)) || (_ord(a) - _ord(b))); }
+    const ORDER_CFG = {
+        section:   { ref: 'sections',   sorted: () => sortedSections(),   parent: null },
+        subject:   { ref: 'subjects',   sorted: () => sortedSubjects(),   parent: 'sectionId' },
+        lesson:    { ref: 'lessons',    sorted: () => sortedLessons(),    parent: 'subjectId' },
+        sublesson: { ref: 'sublessons', sorted: () => sortedSublessons(), parent: 'lessonId' }
+    };
+    function siblingsOf(type, item) {
+        const cfg = ORDER_CFG[type];
+        return cfg.sorted().filter(x => !cfg.parent || x[cfg.parent] === item[cfg.parent]);
+    }
+    function orderOrNext(type, inputId, parentId) {
+        const typed = parseInt(document.getElementById(inputId).value, 10);
+        if (typed > 0) return typed;
+        const cfg = ORDER_CFG[type];
+        const sibs = cfg.sorted().filter(x => !cfg.parent || x[cfg.parent] === parentId);
+        return sibs.reduce((m, x) => Math.max(m, parseInt(x.order, 10) || 0), sibs.length) + 1;
+    }
+    function reorderTo(type, id, pos) {
+        const cfg = ORDER_CFG[type];
+        const item = cfg.sorted().find(x => x.id === id);
+        if (!item) return;
+        const items = siblingsOf(type, item);
+        const from = items.findIndex(x => x.id === id);
+        items.splice(from, 1);
+        let target = parseInt(pos, 10);
+        if (!(target >= 1)) target = from + 1;
+        target = Math.min(target, items.length + 1);
+        items.splice(target - 1, 0, item);
+        const updates = {};
+        items.forEach((x, i) => { updates[cfg.ref + '/' + x.id + '/order'] = i + 1; });
+        database.ref().update(updates)
+            .then(() => { createAutoBackup(); })
+            .catch(error => alert('حدث خطأ أثناء تحديث الترتيب: ' + error.message));
+    }
+    function moveOrder(type, id, delta) {
+        const cfg = ORDER_CFG[type];
+        const item = cfg.sorted().find(x => x.id === id);
+        if (!item) return;
+        const i = siblingsOf(type, item).findIndex(x => x.id === id);
+        reorderTo(type, id, i + 1 + delta);
+    }
+    function orderCtl(type, item) {
+        const sibs = siblingsOf(type, item);
+        const pos = sibs.findIndex(x => x.id === item.id) + 1;
+        const id = escapeHtml(item.id);
+        return `<div class="ord-ctl" title="الترتيب">
+            <button type="button" class="ord-btn" onclick="moveOrder('${type}','${id}',-1)" ${pos <= 1 ? 'disabled' : ''} aria-label="تحريك للأعلى"><i class="fas fa-chevron-up"></i></button>
+            <input type="number" class="ord-input" min="1" max="${sibs.length}" value="${pos}" onchange="reorderTo('${type}','${id}', this.value)" aria-label="رقم الترتيب">
+            <button type="button" class="ord-btn" onclick="moveOrder('${type}','${id}',1)" ${pos >= sibs.length ? 'disabled' : ''} aria-label="تحريك للأسفل"><i class="fas fa-chevron-down"></i></button>
+        </div>`;
+    }
+
     // تحميل الأقسام للإدارة (مع البحث)
+
     function loadSectionsForAdmin() {
         try {
             const list = elements.sectionsList;
             if (!list) return;
 
             const term = getSearchTerm(elements.sectionsSearch);
-            const filtered = sections.filter(section => matchesTerm(term, section.name, section.description));
+            const filtered = sortedSections().filter(section => matchesTerm(term, section.name, section.description));
             updateCountBadge(elements.sectionsCount, filtered.length, 'قسم');
 
             if (!filtered.length) {
@@ -6063,11 +6140,12 @@
 
             list.innerHTML = filtered.map(section => `
                 <div class="question-item">
+                    ${orderCtl('section', section)}
                     <h4><i class="${escapeHtml(section.icon || 'fas fa-layer-group')}"></i> ${escapeHtml(section.name)}</h4>
                     <div class="question-meta">
                         <span><i class="fas fa-graduation-cap"></i> ${Array.isArray(section.grades) && section.grades.length ? escapeHtml(section.grades.map(g => getYearText(g)).join('، ')) : 'لم يتم تحديد صفوف'}</span>
                                                 <span><i class="fas fa-book"></i> ${subjects.filter(s => s.sectionId === section.id).length} مادة</span>
-                        <span><i class="fas fa-sort-numeric-up"></i> الترتيب: <input type="number" min="1" value="${section.order || ''}" onchange="setSectionOrder('${escapeHtml(section.id)}', this.value)" style="width:64px;padding:2px 6px;border:1px solid #cbd5e1;border-radius:8px"></span>
+                        
                     </div>
                     <p>${escapeHtml(section.description || '')}</p>
                     <div class="question-actions">
@@ -6095,7 +6173,7 @@
             if (!list) return;
 
             const term = getSearchTerm(elements.subjectsSearch);
-            const filtered = subjects.filter(subject =>
+            const filtered = sortedSubjects().filter(subject =>
                 matchesTerm(term, subject.name, subject.description, getEntityName(sections, subject.sectionId))
             );
             updateCountBadge(elements.subjectsCount, filtered.length, 'مادة');
@@ -6107,6 +6185,7 @@
 
             list.innerHTML = filtered.map(subject => `
                 <div class="question-item">
+                    ${orderCtl('subject', subject)}
                     <h4><i class="fas ${escapeHtml(subject.icon || 'fa-book')}"></i> ${escapeHtml(subject.name)}</h4>
                     <div class="question-meta">
                         <span><i class="fas fa-layer-group"></i> ${escapeHtml(getEntityName(sections, subject.sectionId) || 'بدون قسم')}</span>
@@ -6135,9 +6214,8 @@
             if (!list) return;
 
             const term = getSearchTerm(elements.lessonsSearch);
-            const filtered = lessons
-                .filter(lesson => matchesTerm(term, lesson.name, lesson.description, getEntityName(subjects, lesson.subjectId)))
-                .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+            const filtered = sortedLessons()
+                .filter(lesson => matchesTerm(term, lesson.name, lesson.description, getEntityName(subjects, lesson.subjectId)));
             updateCountBadge(elements.lessonsCount, filtered.length, 'درس');
 
             if (!filtered.length) {
@@ -6147,11 +6225,11 @@
 
             list.innerHTML = filtered.map(lesson => `
                 <div class="question-item">
+                    ${orderCtl('lesson', lesson)}
                     <h4><i class="fas ${escapeHtml(lesson.icon || 'fa-book-open')}"></i> ${escapeHtml(lesson.name)}</h4>
                     <div class="question-meta">
                         <span><i class="fas fa-book"></i> ${escapeHtml(getEntityName(subjects, lesson.subjectId) || 'بدون مادة')}</span>
                         <span><i class="fas fa-folder"></i> ${sublessons.filter(s => s.lessonId === lesson.id).length} قسم فرعي</span>
-                        <span><i class="fas fa-sort-numeric-up"></i> الترتيب: ${escapeHtml(lesson.order || 1)}</span>
                     </div>
                     <p>${escapeHtml(lesson.description || '')}</p>
                     <div class="question-actions">
@@ -6176,9 +6254,8 @@
             if (!list) return;
 
             const term = getSearchTerm(elements.sublessonsSearch);
-            const filtered = sublessons
-                .filter(sublesson => matchesTerm(term, sublesson.name, sublesson.description, getEntityName(lessons, sublesson.lessonId)))
-                .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+            const filtered = sortedSublessons()
+                .filter(sublesson => matchesTerm(term, sublesson.name, sublesson.description, getEntityName(lessons, sublesson.lessonId)));
             updateCountBadge(elements.sublessonsCount, filtered.length, 'قسم فرعي');
 
             if (!filtered.length) {
@@ -6188,10 +6265,10 @@
 
             list.innerHTML = filtered.map(sublesson => `
                 <div class="question-item">
+                    ${orderCtl('sublesson', sublesson)}
                     <h4><i class="fas ${escapeHtml(sublesson.icon || 'fa-folder')}"></i> ${escapeHtml(sublesson.name)}</h4>
                     <div class="question-meta">
                         <span><i class="fas fa-book-open"></i> ${escapeHtml(getEntityName(lessons, sublesson.lessonId) || 'بدون درس')}</span>
-                        <span><i class="fas fa-sort-numeric-up"></i> الترتيب: ${escapeHtml(sublesson.order || 1)}</span>
                     </div>
                     <p>${escapeHtml(sublesson.description || '')}</p>
                     <div class="question-actions">
@@ -8175,8 +8252,9 @@
             const subjectData = {
                 name: subjectName,
                 description: subjectDescription,
-                sectionId: subjectSection,
+                                sectionId: subjectSection,
                 icon: subjectIcon,
+                order: orderOrNext('subject', 'new-subject-order', subjectSection),
                 createdAt: new Date().toISOString()
             };
             
@@ -8187,6 +8265,7 @@
                     
                     // مسح الحقول
                     elements.newSubjectName.value = '';
+                    document.getElementById('new-subject-order').value = '';
                     elements.newSubjectDescription.value = '';
                     
                     // إعادة تحميل قائمة المواد
@@ -8209,7 +8288,7 @@
             const lessonDescription = elements.newLessonDescription.value.trim();
             const lessonSubject = elements.newLessonSubject.value;
             const lessonIcon = elements.newLessonIcon.value;
-            const lessonOrder = parseInt(elements.newLessonOrder.value) || 1;
+            const lessonOrder = orderOrNext('lesson', 'new-lesson-order', lessonSubject);
             
             if (!lessonName) {
                 alert('الرجاء إدخال اسم الدرس');
@@ -8238,7 +8317,7 @@
                     // مسح الحقول
                     elements.newLessonName.value = '';
                     elements.newLessonDescription.value = '';
-                    elements.newLessonOrder.value = '1';
+                    elements.newLessonOrder.value = '';
                     
                     // إعادة تحميل قائمة الدروس
                     loadLessonsForAdmin();
@@ -8260,7 +8339,7 @@
             const sublessonDescription = elements.newSublessonDescription.value.trim();
             const sublessonLesson = elements.newSublessonLesson.value;
             const sublessonIcon = elements.newSublessonIcon.value;
-            const sublessonOrder = parseInt(elements.newSublessonOrder.value) || 1;
+            const sublessonOrder = orderOrNext('sublesson', 'new-sublesson-order', sublessonLesson);
             
             if (!sublessonName) {
                 alert('الرجاء إدخال اسم القسم الفرعي');
@@ -8289,7 +8368,7 @@
                     // مسح الحقول
                     elements.newSublessonName.value = '';
                     elements.newSublessonDescription.value = '';
-                    elements.newSublessonOrder.value = '1';
+                    elements.newSublessonOrder.value = '';
                     
                     // إعادة تحميل قائمة الأقسام الفرعية
                     loadSublessonsForAdmin();
