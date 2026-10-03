@@ -8076,7 +8076,7 @@
                 description: sectionDescription,
                 icon: sectionIcon,
                                 grades: selectedGrades,
-                order: parseInt(document.getElementById('new-section-order').value, 10) || (sections.reduce((m, x) => Math.max(m, parseInt(x.order, 10) || 0), 0) + 1),
+                order: parseInt(document.getElementById('new-section-order').value, 10) || (sections.reduce((m, x) => Math.max(m, parseInt(x.order, 10) || 0), sections.length) + 1),
                 createdAt: new Date().toISOString()
             };
 
